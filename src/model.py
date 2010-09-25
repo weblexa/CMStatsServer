@@ -1,5 +1,5 @@
 from google.appengine.ext import db
-from utils import parseModVersion
+from utils import parseModVersion, getGeoIPCode
 import logging
 
 DEVICES = ['bravo','dream_sapphire', 'espresso', 'hero', 
@@ -9,6 +9,7 @@ class Device(db.Model):
     type = db.StringProperty()
     version = db.StringProperty()
     version_raw = db.StringProperty()
+    country_code = db.StringProperty()
     first_seen = db.DateTimeProperty(auto_now_add=True)
     last_seen = db.DateTimeProperty(auto_now=True)
     
@@ -32,6 +33,12 @@ class Device(db.Model):
             device = cls(key_name=key_name)
             DeviceAggregate.increment(device_type)
             DeviceVersions.increment(device_version)
+        
+        if device.country_code is None:
+            country_code = getGeoIPCode(kwargs.get('ip'))
+            logging.debug("model country_code = %s" % country_code)
+            if country_code:
+                DeviceCountries.increment(country_code)
             
         # Update DeviceVersions if necessary.
         if device.version and device.version != device_version:
@@ -41,6 +48,7 @@ class Device(db.Model):
         device.type = device_type
         device.version = device_version
         device.version_raw = device_version_raw
+        device.country_code = country_code
         device.put()
         
 class DeviceVersions(db.Model):
@@ -52,7 +60,7 @@ class DeviceVersions(db.Model):
         counter = cls.get_by_key_name(version)
         if counter is None:
             counter = cls(key_name=version)
-            counter.type = version
+            counter.version = version
             counter.count = 0
         
         counter.count += 1
@@ -63,7 +71,7 @@ class DeviceVersions(db.Model):
         counter = cls.get_by_key_name(version)
         if counter is None:
             counter = cls(key_name=version)
-            counter.type = version
+            counter.version = version
             counter.count = 0
         
         counter.count -= 1
@@ -75,6 +83,31 @@ class DeviceVersions(db.Model):
         values = []
         for version in counts:
             value = (version.version, version.count)
+            values.append(value)
+        
+        return values
+    
+class DeviceCountries(db.Model):
+    country_code = db.StringProperty()
+    count = db.IntegerProperty()
+    
+    @classmethod
+    def increment(cls, country_code):
+        counter = cls.get_by_key_name(country_code)
+        if counter is None:
+            counter = cls(key_name=country_code)
+            counter.country_code = country_code
+            counter.count = 0
+        
+        counter.count += 1
+        counter.put()
+    
+    @classmethod
+    def generateGraphData(cls):
+        counts = cls.all().fetch(1000)
+        values = []
+        for device in counts:
+            value = (device.country_code, device.count)
             values.append(value)
         
         return values

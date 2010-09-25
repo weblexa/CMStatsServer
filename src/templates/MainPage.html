@@ -7,7 +7,7 @@
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
         // Load the Visualization API and the piechart package.
-        google.load('visualization', '1', {'packages':['corechart']});
+        google.load('visualization', '1', {'packages':['corechart', 'geomap']});
         
         // Set a callback to run when the Google Visualization API is loaded.
         google.setOnLoadCallback(drawCharts);
@@ -16,6 +16,7 @@
         function drawCharts() {
             drawDeviceChart();
             drawVersionChart();
+            drawCountryChart();
         }
         
         function drawDeviceChart() {
@@ -46,6 +47,20 @@
             var chart = new google.visualization.PieChart(document.getElementById('version_chart'));
             chart.draw(data, {width: 600, height: 440, title: 'Installations by Version'});
         }
+        
+        function drawCountryChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Country');
+            data.addColumn('number', 'Installations');
+            data.addRows([
+                {% for value in graph_by_country %}
+                ['{{ value.0 }}', {{ value.1 }}],
+                {% endfor %}
+            ]);
+            
+            var chart = new google.visualization.GeoMap(document.getElementById('country_chart'));
+            chart.draw(data, {width: 600, height: 440, title: 'Installations by Country'});
+        }
     </script>
     
     <link rel="stylesheet" href="/static/blueprint/screen.css" type="text/css" media="screen, projection"> 
@@ -59,5 +74,6 @@
     <b>Total Devices: </b> {{ devices_count }}<br/><hr/>
     <div id="device_chart"></div>
     <div id="version_chart"></div>
+    <div id="country_chart"></div>
 </body>
 </html>
