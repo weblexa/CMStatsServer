@@ -42,6 +42,12 @@ class DeviceVersions(db.Model):
     @classmethod
     def update(cls):
         devices = Device.all()
+        versions = DeviceVersions.all()
+        
+        for version in versions:
+            version.count = 0
+            version.put()
+        
         for device in devices:
             version = cls.get_by_key_name(device.version)
             if version is None:
@@ -53,22 +59,14 @@ class DeviceVersions(db.Model):
             version.put()
             
     @classmethod
-    def generateGraph(cls):
-        url = "http://chart.apis.google.com/chart?chs=600x225&cht=p&chco=01A0A3&chd=t:%(values)s&chdl=%(versions)s&chl=%(versions)s&chtt=Installations+by+Version"
-        
+    def generateGraphData(cls):
         counts = cls.all().fetch(100)
-        values = {}
+        values = []
         for version in counts:
-            values[version.version] = version.count
-            
-        values = {
-            'values': ",".join([str(x) for x in values.values()]),
-            'versions': "|".join(values.keys())          
-        }
+            value = (version.version, version.count)
+            values.append(value)
         
-        url = url % values
-        
-        return url
+        return values
     
 class DeviceAggregate(db.Model):
     type = db.StringProperty()
@@ -86,19 +84,16 @@ class DeviceAggregate(db.Model):
         counter.put()
         
     @classmethod
-    def generateGraph(cls):
-        url = "http://chart.apis.google.com/chart?chs=600x225&cht=p&chco=01A0A3&chd=t:%(values)s&chdl=%(devices)s&chl=%(devices)s&chtt=Installations+by+Device"
-        
+    def getCount(cls):
+        devices = db.GqlQuery("SELECT * FROM DeviceAggregate")
+        return devices.count()
+    
+    @classmethod
+    def generateGraphData(cls):
         counts = cls.all().fetch(100)
-        values = {}
+        values = []
         for device in counts:
-            values[device.type] = device.count
-            
-        values = {
-            'values': ",".join([str(x) for x in values.values()]),
-            'devices': "|".join(values.keys())          
-        }
+            value = (device.type, device.count)
+            values.append(value)
         
-        url = url % values
-        
-        return url
+        return values

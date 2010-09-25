@@ -9,8 +9,9 @@ class MainPage(webapp.RequestHandler):
     def get(self):
         tpl_values = {
             'unique_count': Device.getUniqueCount(),
-            'graph_by_device': DeviceAggregate.generateGraph(),
-            'graph_by_version': DeviceVersions.generateGraph(),
+            'devices_count': DeviceAggregate.getCount(),
+            'graph_by_device': DeviceAggregate.generateGraphData(),
+            'graph_by_version': DeviceVersions.generateGraphData(),
         }
         
         tpl_path = os.path.join(os.path.dirname(__file__), 'index.html')

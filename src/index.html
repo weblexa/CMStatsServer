@@ -1,10 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd"> 
 <html>
 <head>
-
+    <title>CM Installation Statistics</title>
+    
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+        // Load the Visualization API and the piechart package.
+        google.load('visualization', '1', {'packages':['corechart']});
+        
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.setOnLoadCallback(drawCharts);
+        
+        // Callbacks
+        function drawCharts() {
+            drawDeviceChart();
+            drawVersionChart();
+        }
+        
+        function drawDeviceChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Device');
+            data.addColumn('number', 'Installations');
+            data.addRows([
+                {% for value in graph_by_device %}
+                ['{{ value.0 }}', {{ value.1 }}],
+                {% endfor %}
+            ]);
+            
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.PieChart(document.getElementById('device_chart'));
+            chart.draw(data, {width: 600, height: 440, title: 'Installations by Device'});
+        }
+        
+        function drawVersionChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Versions');
+            data.addColumn('number', 'Installations');
+            data.addRows([
+                {% for value in graph_by_version %}
+                ['{{ value.0 }}', {{ value.1 }}],
+                {% endfor %}
+            ]);
+            
+            var chart = new google.visualization.PieChart(document.getElementById('version_chart'));
+            chart.draw(data, {width: 600, height: 440, title: 'Installations by Version'});
+        }
+    </script>
+    
+    <link rel="stylesheet" href="/static/blueprint/screen.css" type="text/css" media="screen, projection"> 
+    <link rel="stylesheet" href="/static/blueprint/print.css" type="text/css" media="print"> 
+    <!--[if lt IE 8]><link rel="stylesheet" href="/static/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+    
+    <link rel="stylesheet" href="/static/core.css">
 </head>
 <body>
-    <b>Unique Installs: </b> {{ unique_count }}<br/><hr/>
-    <img src="{{ graph_by_device }}"><br/><hr/>
-    <img src="{{ graph_by_version }}">
+    <b>Unique Installs: </b> {{ unique_count }}<br/>
+    <b>Total Devices: </b> {{ devices_count }}<br/><hr/>
+    <div id="device_chart"></div>
+    <div id="version_chart"></div>
 </body>
 </html>
