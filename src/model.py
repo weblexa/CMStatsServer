@@ -38,6 +38,7 @@ class Device(db.Model):
             country_code = getGeoIPCode(kwargs.get('ip'))
             logging.debug("model country_code = %s" % country_code)
             if country_code:
+                device.country_code = country_code
                 DeviceCountries.increment(country_code)
 
         # Update UnknownVersions if necessary.
@@ -55,7 +56,6 @@ class Device(db.Model):
         device.type = device_type
         device.version = device_version
         device.version_raw = device_version_raw
-        device.country_code = country_code
         device.put()
 
 class UnknownVersions(db.Model):
