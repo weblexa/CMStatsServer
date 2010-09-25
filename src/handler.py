@@ -1,5 +1,6 @@
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
+from model import Device
 
 
 class MainPage(webapp.RequestHandler):
@@ -7,10 +8,23 @@ class MainPage(webapp.RequestHandler):
     
     def get(self):
         self.response.headers['Content-Type'] = 'text/plain'
-        self.response.out.write('Hello, webapp World!')
+        self.response.out.write('Count: %s' % Device.getUniqueCount())
 
+class SubmitPage(webapp.RequestHandler):
+    
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.out.write('Invalid Request')
+        
+    def post(self):
+        kwargs = {
+            'key_name': self.request.get('id'),
+            'type': self.request.get('type')          
+        }
+        Device.update(**kwargs)
 
-application = webapp.WSGIApplication([('/', MainPage)], debug=True)
+application = webapp.WSGIApplication(
+        [('/', MainPage), ('/submit', SubmitPage)], debug=True)
 
 
 def main():
