@@ -39,6 +39,13 @@ class Device(db.Model):
             logging.debug("model country_code = %s" % country_code)
             if country_code:
                 DeviceCountries.increment(country_code)
+                
+        # Update UnknownVersions if necessary.
+        if device_version == "Unknown":
+            if device.version_raw != device_version_raw:
+                UnknownVersions.increment(device_version_raw)
+                if device.device_version_raw:
+                    UnknownVersions.decrement(device.device_version_raw)
             
         # Update DeviceVersions if necessary.
         if device.version and device.version != device_version:
@@ -50,6 +57,42 @@ class Device(db.Model):
         device.version_raw = device_version_raw
         device.country_code = country_code
         device.put()
+        
+class UnknownVersions(db.Model):
+    version = db.StringProperty()
+    count = db.IntegerProperty()
+    
+    @classmethod
+    def increment(cls, key):
+        counter = cls.get_by_key_name(key)
+        if counter is None:
+            counter = cls(key_name=key)
+            counter.version = key
+            counter.count = 0
+        
+        counter.count += 1
+        counter.put()
+        
+    @classmethod
+    def decrement(cls, key):
+        counter = cls.get_by_key_name(key)
+        if counter is None:
+            counter = cls(key_name=key)
+            counter.version = key
+            counter.count = 0
+        
+        counter.count -= 1
+        counter.put()
+        
+    @classmethod
+    def generateGraphData(cls):
+        counts = cls.all().fetch(100)
+        values = []
+        for version in counts:
+            value = (version.version, version.count)
+            values.append(value)
+        
+        return values
         
 class DeviceVersions(db.Model):
     version = db.StringProperty()
