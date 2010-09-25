@@ -19,7 +19,8 @@ class SubmitPage(webapp.RequestHandler):
     def post(self):
         kwargs = {
             'key_name': self.request.get('id'),
-            'type': self.request.get('type')          
+            'type': self.request.get('type'),
+            'version': self.request.get('version'),
         }
         Device.update(**kwargs)
 

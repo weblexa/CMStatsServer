@@ -1,4 +1,5 @@
 from google.appengine.ext import db
+from utils import parseModVersion
 
 class Device(db.Model):
     type = db.StringProperty()
@@ -14,6 +15,7 @@ class Device(db.Model):
     def update(cls, **kwargs):
         device = cls(key_name=kwargs.get('key_name'))
         device.type = kwargs.get('type')
+        device.version = parseModVersion(kwargs.get('version'))
         device.put()
         return device
     
