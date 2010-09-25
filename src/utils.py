@@ -1,4 +1,5 @@
 import re
+from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 import logging
 
@@ -26,7 +27,19 @@ def getGeoIPCode(ipaddr):
 
     return geoipcode
 
+class MemcacheObject(object):
+    def __init__(self, key):
+        self.key = key
+        self.value = memcache.get(key)
+
+    def set(self, value, expiration=60):
+        memcache.add(self.key, value, expiration)
+        self.value = value
+        return self.get()
+
+    def get(self):
+        return self.value
+
 if __name__ == '__main__':
-    print parseModVersion("CyanogenMod-6-09242010-NIGHTLY-N1")
-    print parseModVersion("CyanogenMod-6.0-N1")
-    print parseModVersion("CyanogenMod-6.1.0-RC0-Droid")
+    mo = MemcacheObject('key')
+    print mo

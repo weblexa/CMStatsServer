@@ -1,5 +1,5 @@
 from google.appengine.ext import db
-from utils import parseModVersion, getGeoIPCode
+from utils import parseModVersion, getGeoIPCode, MemcacheObject
 import logging
 
 DEVICES = ['bravo', 'dream_sapphire', 'espresso', 'hero',
@@ -15,8 +15,12 @@ class Device(db.Model):
 
     @classmethod
     def getUniqueCount(self):
-        devices = db.GqlQuery("SELECT * FROM Device")
-        return devices.count()
+        mo = MemcacheObject("Device.getUniqueCount")
+        if mo.get() is None:
+            devices = db.GqlQuery("SELECT * FROM Device").count()
+            return mo.set(devices)
+        else:
+            return mo.get()
 
     @classmethod
     def update(cls, **kwargs):
@@ -86,13 +90,17 @@ class DeviceVersions(db.Model):
 
     @classmethod
     def generateGraphData(cls):
-        counts = cls.all().fetch(100)
-        values = []
-        for version in counts:
-            value = (version.version, version.count)
-            values.append(value)
+        mo = MemcacheObject("DeviceVersions.generateGraphData")
+        if mo.get() is None:
+            counts = cls.all().fetch(100)
+            values = []
+            for version in counts:
+                value = (version.version, version.count)
+                values.append(value)
 
-        return values
+            return mo.set(values)
+        else:
+            return mo.get()
 
 class DeviceCountries(db.Model):
     country_code = db.StringProperty()
@@ -111,13 +119,17 @@ class DeviceCountries(db.Model):
 
     @classmethod
     def generateGraphData(cls):
-        counts = cls.all().fetch(1000)
-        values = []
-        for device in counts:
-            value = (device.country_code, device.count)
-            values.append(value)
+        mo = MemcacheObject("DeviceCountries.generateGraphData")
+        if mo.get() is None:
+            counts = cls.all().fetch(1000)
+            values = []
+            for device in counts:
+                value = (device.country_code, device.count)
+                values.append(value)
 
-        return values
+            return mo.set(values)
+        else:
+            return mo.get()
 
 class DeviceAggregate(db.Model):
     type = db.StringProperty()
@@ -136,18 +148,26 @@ class DeviceAggregate(db.Model):
 
     @classmethod
     def getCount(cls):
-        devices = db.GqlQuery("SELECT * FROM DeviceAggregate")
-        return devices.count()
+        mo = MemcacheObject("DeviceAggregate.getCount")
+        if mo.get() is None:
+            devices = db.GqlQuery("SELECT * FROM DeviceAggregate").count()
+            return mo.set(devices)
+        else:
+            return mo.get()
 
     @classmethod
     def generateGraphData(cls):
-        counts = cls.all().fetch(100)
-        values = []
-        for device in counts:
-            value = (device.type, device.count)
-            values.append(value)
+        mo = MemcacheObject("DeviceAggregate.generateGraphData")
+        if mo.get() is None:
+            counts = cls.all().fetch(100)
+            values = []
+            for device in counts:
+                value = (device.type, device.count)
+                values.append(value)
 
-        return values
+            return mo.set(values)
+        else:
+            return mo.get()
 
 class UnknownVersions(db.Model):
     version = db.StringProperty()
@@ -177,10 +197,14 @@ class UnknownVersions(db.Model):
 
     @classmethod
     def generateGraphData(cls):
-        counts = cls.all().fetch(100)
-        values = []
-        for version in counts:
-            value = (version.version, version.count)
-            values.append(value)
+        mo = MemcacheObject("UnknownVersions.generateGraphData")
+        if mo.get() is None:
+            counts = cls.all().fetch(100)
+            values = []
+            for version in counts:
+                value = (version.version, version.count)
+                values.append(value)
 
-        return values
+            return mo.set(values)
+        else:
+            return mo.get()
