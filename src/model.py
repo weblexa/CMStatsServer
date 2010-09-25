@@ -3,7 +3,7 @@ from utils import parseModVersion
 
 class Device(db.Model):
     type = db.StringProperty()
-    version = db.IntegerProperty()
+    version = db.StringProperty()
     datetime = db.DateTimeProperty(auto_now_add=True)
     
     @classmethod
