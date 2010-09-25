@@ -14,7 +14,7 @@ class MainPage(webapp.RequestHandler):
             'graph_by_version': DeviceVersions.generateGraphData(),
         }
         
-        tpl_path = os.path.join(os.path.dirname(__file__), 'index.html')
+        tpl_path = os.path.join(os.path.dirname(__file__), 'templates/index.html')
         self.response.out.write(template.render(tpl_path, tpl_values))
 
 class SubmitPage(webapp.RequestHandler):
