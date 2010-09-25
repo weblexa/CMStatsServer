@@ -1,17 +1,21 @@
 from google.appengine.ext import webapp
+from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
-from model import Device
-
+from model import Device, DeviceAggregate
+import logging
+import os.path
 
 class MainPage(webapp.RequestHandler):
-    
-    
     def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.out.write('Count: %s' % Device.getUniqueCount())
+        tpl_values = {
+            'unique_count': Device.getUniqueCount(),
+            'graph_by_device': DeviceAggregate.generateGraph(),
+        }
+        
+        tpl_path = os.path.join(os.path.dirname(__file__), 'index.html')
+        self.response.out.write(template.render(tpl_path, tpl_values))
 
 class SubmitPage(webapp.RequestHandler):
-    
     def get(self):
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.out.write('Invalid Request')

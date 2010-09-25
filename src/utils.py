@@ -12,6 +12,6 @@ def parseModVersion(modver):
     return version
 
 if __name__ == '__main__':
-    print parseModVersion("CyanogenMod-6-01012010-NIGHTLY-N1")
+    print parseModVersion("CyanogenMod-6-09242010-NIGHTLY-N1")
     print parseModVersion("CyanogenMod-6.0-N1")
     print parseModVersion("CyanogenMod-6.1.0-RC0-Droid")
