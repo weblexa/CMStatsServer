@@ -7,7 +7,7 @@ from model import Device, DeviceAggregate, DeviceVersions, DeviceCountries, \
 class MainPage(BasePage):
     def get(self):
         tpl_values = {
-            'unique_count': Device.getUniqueCount(),
+            'device_count': Device.getCount(),
             'devices_count': DeviceAggregate.getCount(),
             'graph_by_device': DeviceAggregate.generateGraphData(),
             'graph_by_version': DeviceVersions.generateGraphData(),

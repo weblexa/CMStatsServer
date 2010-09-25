@@ -14,11 +14,11 @@ class Device(db.Model):
     last_seen = db.DateTimeProperty(auto_now=True)
 
     @classmethod
-    def getUniqueCount(self):
-        mo = MemcacheObject("Device.getUniqueCount")
+    def getCount(self):
+        mo = MemcacheObject("Device.getCount")
         if mo.get() is None:
             devices = db.GqlQuery("SELECT * FROM Device").count()
-            return mo.set(devices)
+            return mo.set(devices, 30)
         else:
             return mo.get()
 
