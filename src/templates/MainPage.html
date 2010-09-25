@@ -70,10 +70,15 @@
     <link rel="stylesheet" href="/static/core.css">
 </head>
 <body>
-    <b>Unique Installs: </b> {{ unique_count }}<br/>
-    <b>Total Devices: </b> {{ devices_count }}<br/><hr/>
-    <div id="device_chart"></div>
-    <div id="version_chart"></div>
-    <div id="country_chart"></div>
+    <div class="container">
+        <h3>CyanogenMod Statistics</h3>
+        <div class="summary">
+            <b>Unique Installs: </b> {{ unique_count }}<br/>
+            <b>Total Devices: </b> {{ devices_count }}<br/>
+        </div>
+        <div id="device_chart" class="chart"></div>
+        <div id="version_chart" class="chart"></div>
+        <div id="country_chart" class="chart"></div>
+    </div>
 </body>
 </html>
