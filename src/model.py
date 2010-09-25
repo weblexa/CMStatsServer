@@ -58,42 +58,6 @@ class Device(db.Model):
         device.version_raw = device_version_raw
         device.put()
 
-class UnknownVersions(db.Model):
-    version = db.StringProperty()
-    count = db.IntegerProperty()
-
-    @classmethod
-    def increment(cls, key):
-        counter = cls.get_by_key_name(key)
-        if counter is None:
-            counter = cls(key_name=key)
-            counter.version = key
-            counter.count = 0
-
-        counter.count += 1
-        counter.put()
-
-    @classmethod
-    def decrement(cls, key):
-        counter = cls.get_by_key_name(key)
-        if counter is None:
-            counter = cls(key_name=key)
-            counter.version = key
-            counter.count = 0
-
-        counter.count -= 1
-        counter.put()
-
-    @classmethod
-    def generateGraphData(cls):
-        counts = cls.all().fetch(100)
-        values = []
-        for version in counts:
-            value = (version.version, version.count)
-            values.append(value)
-
-        return values
-
 class DeviceVersions(db.Model):
     version = db.StringProperty()
     count = db.IntegerProperty()
@@ -181,6 +145,42 @@ class DeviceAggregate(db.Model):
         values = []
         for device in counts:
             value = (device.type, device.count)
+            values.append(value)
+
+        return values
+
+class UnknownVersions(db.Model):
+    version = db.StringProperty()
+    count = db.IntegerProperty()
+
+    @classmethod
+    def increment(cls, key):
+        counter = cls.get_by_key_name(key)
+        if counter is None:
+            counter = cls(key_name=key)
+            counter.version = key
+            counter.count = 0
+
+        counter.count += 1
+        counter.put()
+
+    @classmethod
+    def decrement(cls, key):
+        counter = cls.get_by_key_name(key)
+        if counter is None:
+            counter = cls(key_name=key)
+            counter.version = key
+            counter.count = 0
+
+        counter.count -= 1
+        counter.put()
+
+    @classmethod
+    def generateGraphData(cls):
+        counts = cls.all().fetch(100)
+        values = []
+        for version in counts:
+            value = (version.version, version.count)
             values.append(value)
 
         return values
