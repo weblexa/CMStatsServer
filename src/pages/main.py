@@ -12,7 +12,7 @@ class MainPage(BasePage):
             'graph_by_version': DeviceVersions.generateGraphData(),
             'graph_by_country': DeviceCountries.generateGraphData(),
         }
-        
+
         self.render(tpl_values)
 
 application = webapp.WSGIApplication(

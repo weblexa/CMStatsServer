@@ -10,7 +10,7 @@ def parseModVersion(modver):
             version = "Nightly"
     else:
         version = "Unknown"
-    
+
     return version
 
 def getGeoIPCode(ipaddr):
@@ -21,9 +21,9 @@ def getGeoIPCode(ipaddr):
             geoipcode = fetch_response.content
     except urlfetch.Error:
         pass
-    
+
     logging.debug("geoip = %s" % geoipcode)
-    
+
     return geoipcode
 
 if __name__ == '__main__':
