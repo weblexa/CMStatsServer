@@ -9,9 +9,6 @@ handlers:
   
 - url: /submit
   script: pages/submit.py
-  
-- url: /tasks/.*
-  script: pages/tasks.py
 
 - url: /static
   static_dir: static

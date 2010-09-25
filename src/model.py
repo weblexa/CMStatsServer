@@ -26,9 +26,17 @@ class Device(db.Model):
         
         device = cls.get_by_key_name(key_name)
         logging.debug("/submit device = %s" % device)
+        
+        # Create new record if one does not exist.
         if device is None:
             device = cls(key_name=key_name)
             DeviceAggregate.increment(device_type)
+            DeviceVersions.increment(device_version)
+            
+        # Update DeviceVersions if necessary.
+        if device.version and device.version != device_version:
+            DeviceVersions.decrement(device.version)
+            DeviceVersions.increment(device_version)
             
         device.type = device_type
         device.version = device_version
@@ -40,23 +48,26 @@ class DeviceVersions(db.Model):
     count = db.IntegerProperty()
     
     @classmethod
-    def update(cls):
-        devices = Device.all()
-        versions = DeviceVersions.all()
+    def increment(cls, version):
+        counter = cls.get_by_key_name(version)
+        if counter is None:
+            counter = cls(key_name=version)
+            counter.type = version
+            counter.count = 0
         
-        for version in versions:
-            version.count = 0
-            version.put()
+        counter.count += 1
+        counter.put()
         
-        for device in devices:
-            version = cls.get_by_key_name(device.version)
-            if version is None:
-                version = cls(key_name=device.version)
-                version.version = device.version
-                version.count = 0
-                
-            version.count += 1
-            version.put()
+    @classmethod
+    def decrement(cls, version):
+        counter = cls.get_by_key_name(version)
+        if counter is None:
+            counter = cls(key_name=version)
+            counter.type = version
+            counter.count = 0
+        
+        counter.count -= 1
+        counter.put()
             
     @classmethod
     def generateGraphData(cls):
