@@ -1,7 +1,8 @@
 from base import BasePage
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
-from model import Device, DeviceAggregate, DeviceVersions, DeviceCountries
+from model import Device, DeviceAggregate, DeviceVersions, DeviceCountries, \
+    UnknownVersions
 
 class MainPage(BasePage):
     def get(self):
@@ -11,6 +12,7 @@ class MainPage(BasePage):
             'graph_by_device': DeviceAggregate.generateGraphData(),
             'graph_by_version': DeviceVersions.generateGraphData(),
             'graph_by_country': DeviceCountries.generateGraphData(),
+            'graph_unknown_versions': UnknownVersions.generateGraphData(),
         }
 
         self.render(tpl_values)
