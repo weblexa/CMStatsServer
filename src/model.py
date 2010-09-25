@@ -8,6 +8,7 @@ DEVICES = ['bravo','dream_sapphire', 'espresso', 'hero',
 class Device(db.Model):
     type = db.StringProperty()
     version = db.StringProperty()
+    version_raw = db.StringProperty()
     first_seen = db.DateTimeProperty(auto_now_add=True)
     last_seen = db.DateTimeProperty(auto_now=True)
     
@@ -21,6 +22,7 @@ class Device(db.Model):
         key_name = kwargs.get('key_name')
         device_type = kwargs.get('type')
         device_version = parseModVersion(kwargs.get('version'))
+        device_version_raw = kwargs.get('version')
         
         device = cls.get_by_key_name(key_name)
         logging.debug("/submit device = %s" % device)
@@ -30,6 +32,7 @@ class Device(db.Model):
             
         device.type = device_type
         device.version = device_version
+        device.version_raw = device_version_raw
         device.put()
         
 class DeviceVersions(db.Model):
