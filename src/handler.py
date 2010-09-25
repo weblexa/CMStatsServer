@@ -1,7 +1,7 @@
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
-from model import Device, DeviceAggregate
+from model import Device, DeviceAggregate, DeviceVersions
 import logging
 import os.path
 
@@ -10,6 +10,7 @@ class MainPage(webapp.RequestHandler):
         tpl_values = {
             'unique_count': Device.getUniqueCount(),
             'graph_by_device': DeviceAggregate.generateGraph(),
+            'graph_by_version': DeviceVersions.generateGraph(),
         }
         
         tpl_path = os.path.join(os.path.dirname(__file__), 'index.html')

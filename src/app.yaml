@@ -4,5 +4,11 @@ runtime: python
 api_version: 1
 
 handlers:
-- url: /.*
+- url: /
   script: handler.py
+  
+- url: /submit
+  script: handler.py
+  
+- url: /tasks/.*
+  script: tasks.py

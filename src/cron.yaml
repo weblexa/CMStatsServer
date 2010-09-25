@@ -1,0 +1,4 @@
+cron:
+- description: Aggregate versions.
+  url: /tasks/aggregate_versions
+  schedule: every 5 minutes
