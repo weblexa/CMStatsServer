@@ -11,7 +11,7 @@ class AggregateDevicesPage(BasePage):
         for row in DeviceAggregate.all():
             row.delete()
 
-        total = (Device.all().count() / 10)
+        total = (Device.all().count() / 10) + 1
         for x in xrange(total):
             offset = x * 10
             taskqueue.add(url='/tasks/AggregateDevicesWorker', params={'offset': offset})
@@ -20,7 +20,7 @@ class AggregateDevicesWorkerPage(BasePage):
     def post(self):
         offset = int(self.request.get('offset'))
 
-        devices = Device.all().fetch(10, offset) + 1
+        devices = Device.all().fetch(10, offset)
         for device in devices:
             logging.debug("Device: %s" % device.key().name())
             DeviceAggregate.increment(device.type)
