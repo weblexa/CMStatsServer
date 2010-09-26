@@ -1,5 +1,6 @@
 from base import BasePage
 from google.appengine.ext import webapp
+from google.appengine.ext import db
 from google.appengine.ext.webapp.util import run_wsgi_app
 from model import Device
 
@@ -13,7 +14,7 @@ class SubmitPage(BasePage):
             'carrier': self.request.get('carrier'),
             'ip': self.request.remote_addr,
         }
-        Device.add(**kwargs)
+        db.run_in_transaction(Device.add, **kwargs)
 
 application = webapp.WSGIApplication(
         [('/submit', SubmitPage)], debug=True)
