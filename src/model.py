@@ -1,7 +1,6 @@
 from base import BaseShardedCounter
 from google.appengine.ext import db
 from utils import parseModVersion, MemcacheObject
-import logging
 
 class Device(db.Model):
     type = db.StringProperty()

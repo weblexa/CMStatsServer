@@ -4,7 +4,6 @@ from utils import MemcacheObject
 import hashlib
 import os
 import random
-import logging
 
 class BasePage(webapp.RequestHandler):
     def __init__(self):

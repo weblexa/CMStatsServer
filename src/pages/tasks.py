@@ -1,11 +1,10 @@
 from base import BasePage
 from google.appengine.api.labs import taskqueue
-from google.appengine.ext import webapp, db
+from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from model import DeviceAggregate, Device, DeviceCarriers, DeviceVersions, \
     DeviceCountries, UnknownVersions
 import logging
-import random
 
 class AggregateDevicesPage(BasePage):
     def get(self):

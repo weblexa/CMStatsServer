@@ -1,6 +1,5 @@
 import re
 from google.appengine.api import memcache
-from google.appengine.api import urlfetch
 import logging
 
 def parseModVersion(modver):
@@ -13,19 +12,6 @@ def parseModVersion(modver):
         version = "Unknown"
 
     return version
-
-def getGeoIPCode(ipaddr):
-    geoipcode = None
-    try:
-        fetch_response = urlfetch.fetch('http://geoip.wtanaka.com/cc/%s' % ipaddr)
-        if fetch_response.status_code == 200:
-            geoipcode = fetch_response.content
-    except urlfetch.Error:
-        pass
-
-    logging.debug("geoip = %s" % geoipcode)
-
-    return geoipcode
 
 class MemcacheObject(object):
     def __init__(self, key):
