@@ -8,13 +8,12 @@ class SubmitPage(BasePage):
     def post(self):
         kwargs = {
             'key_name': self.request.get('id'),
-            'type': self.request.get('type'),
+            'device': self.request.get('type'),
             'version': self.request.get('version'),
             'country': self.request.get('country'),
             'carrier': self.request.get('carrier'),
-            'ip': self.request.remote_addr,
         }
-        db.run_in_transaction(Device.add, **kwargs)
+        Device.add(**kwargs)
 
 application = webapp.WSGIApplication(
         [('/submit', SubmitPage)], debug=True)

@@ -7,6 +7,9 @@ handlers:
 - url: /
   script: pages/main.py
   
+- url: /data/.*
+  script: pages/data.py
+  
 - url: /ajax/.*
   script: pages/ajax.py
   

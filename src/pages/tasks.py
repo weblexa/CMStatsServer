@@ -41,7 +41,7 @@ class FlushCounterWorkerPage(BasePage):
 
 class AggregateDevicesPage(BasePage):
     def get(self):
-        taskqueue.add(url='/tasks/FlushQueue', params={'cls': 'DeviceAggregate'})
+        #taskqueue.add(url='/tasks/FlushQueue', params={'cls': 'DeviceAggregate'})
         db.delete(DeviceAggregate.all().fetch(400))
 
         total = (Device.all().count() / 10) + 1

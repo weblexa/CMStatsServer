@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd"> 
+<html>
+<head>
+    <title>CM Installation Statistics</title>
+    
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+        // Load the Visualization API and the piechart package.
+        google.load('visualization', '1', {'packages':['corechart', 'table']});
+        google.load("jquery", "1.4.2");
+        google.load("jqueryui", "1.8.5");
+        
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.setOnLoadCallback(function(){
+            drawCharts();
+        });
+        
+        // Callbacks
+        function drawCharts() {
+            drawCarrierTable();
+            drawCarrierChart();
+        }
+        
+        function drawCarrierTable() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Carrier');
+            data.addColumn('number', 'Count');
+            data.addRows([
+                {% for value in carrier_data %}
+                ['{{ value.0 }}', {{ value.1 }}],
+                {% endfor %}
+            ]);
+            
+            var chart = new google.visualization.Table(document.getElementById('carrier_table'));
+            chart.draw(data, {showRowNumber: false});
+        }
+        
+        function drawCarrierChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Carrier');
+            data.addColumn('number', 'Installations');
+            data.addRows([
+                {% for value in carrier_data %}
+                ['{{ value.0 }}', {{ value.1 }}],
+                {% endfor %}
+            ]);
+            
+            var chart = new google.visualization.PieChart(document.getElementById('carrier_chart'));
+            chart.draw(data, {width: 628, height: 300, title: 'Carriers'});
+        }
+    </script>
+    
+    <link rel="stylesheet" href="/static/blueprint/screen.css" type="text/css" media="screen, projection"> 
+    <link rel="stylesheet" href="/static/blueprint/print.css" type="text/css" media="print"> 
+    <!--[if lt IE 8]><link rel="stylesheet" href="/static/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+    
+    <link rel="stylesheet" href="/static/core.css">
+</head>
+<body>
+    <div class="container">
+        <h3>CyanogenMod Statistics - Carriers</h3>
+        
+        <div id="navigation">
+            <a href="/">Dashboard</a> <a href="/data/carriers.html">Carriers</a>
+        </div>
+        <br/>
+        <div class="span-24 last"><div class="chart" id="carrier_chart"></div></div>
+        <br/>
+        <div class="span-24 last`"><div class="chart" id="carrier_table"></div></div>
+    </div>
+</body>
+</html>

@@ -24,6 +24,17 @@ class BaseShardedCounter(db.Model):
     count = db.IntegerProperty(required=True, default=0)
 
     @classmethod
+    def decrement(cls, key_):
+        # Find a shard to decrement.
+        def txn():
+            shard = cls.all().filter('count >=', '1').filter('key_ =', key_).get()
+            if shard:
+                shard.count -= 1
+                shard.put()
+            return True
+        return db.run_in_transaction(txn)
+
+    @classmethod
     def increment(cls, key_):
         # Store unique key.
         cls_key = hashlib.md5(cls.__name__ + "_" + key_).hexdigest()
@@ -43,7 +54,8 @@ class BaseShardedCounter(db.Model):
             counter.count += 1
             counter.key_ = key_
             counter.put()
-        db.run_in_transaction(txn)
+            return True
+        return db.run_in_transaction(txn)
 
     @classmethod
     def getKeyCount(cls):

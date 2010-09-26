@@ -25,30 +25,67 @@ class Device(db.Model):
             carrier = "T-Mobile"
 
         if not self.carrier and carrier:
+            DeviceCarriers.increment(carrier)
             self.carrier = carrier
 
     def updateCountry(self, country):
         if not self.country_code and country != "Unknown" and country:
+            DeviceCountries.increment(country)
             self.country_code = country
 
-    def updateVersion(self, raw_version):
-        clean_version = parseModVersion(raw_version)
-        self.version = clean_version
-        self.version_raw = raw_version
+    def updateVersion(self, version_raw):
+        version_clean = parseModVersion(version_raw)
+
+        if not self.version:
+            DeviceVersions.increment(version_clean)
+
+        if not self.version_raw and version_clean == "Unknown":
+            UnknownVersions.increment(version_raw)
+
+        # This looks like an upgrade, decrement the previous version.
+        if self.version and self.version != version_clean:
+            DeviceVersions.decrement(self.version)
+            DeviceVersions.increment(version_clean)
+
+        if self.version == "Unknown" and self.version_raw and self.version_raw != version_raw:
+            UnknownVersions.decrement(self.version_raw)
+            UnknownVersions.increment(version_raw)
+
+        # Finally, update the versions.
+        self.version = version_clean
+        self.version_raw = version_raw
 
     @classmethod
     def add(cls, **kwargs):
+        rollback = False
         device = cls.get_by_key_name(kwargs.get('key_name'))
+
+        # Sanity Checks
+        if kwargs.get('key_name') is None:
+            return
+        if kwargs.get('device') is None:
+            return
+        if kwargs.get('version') is None:
+            return
+        if kwargs.get('carrier') is None:
+            kwargs['carrier'] = "Unknown"
+        if kwargs.get('country') is None:
+            kwargs['country'] = "Unknown"
 
         # Create new record if one does not exist.
         if device is None:
             device = cls(key_name=kwargs.get('key_name'))
-            device.type = kwargs.get('type')
+            device.type = kwargs.get('device')
 
-        device.updateCarrier(kwargs.get('carrier'))
-        device.updateCountry(kwargs.get('country'))
-        device.updateVersion(kwargs.get('version'))
-        device.put()
+        if not device.updateCarrier(kwargs.get('carrier')):
+            rollback = True
+        if not device.updateCountry(kwargs.get('country')):
+            rollback = True
+        if not device.updateVersion(kwargs.get('version')):
+            rollback = True
+
+        if not rollback:
+            device.put()
 
 class DeviceCarriers(BaseShardedCounter):
     pass

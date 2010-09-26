@@ -1,15 +1,11 @@
 from base import BasePage
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
-from model import Device, DeviceAggregate
+from model import Device
 
 class AjaxDeviceCount(BasePage):
     def get(self):
         self.response.out.write("%s" % Device.getCount())
-
-class AjaxDevicesCount(BasePage):
-    def get(self):
-        self.response.out.write("%s" % DeviceAggregate.getCount())
 
 class LiveCounter(BasePage):
     def get(self):
@@ -17,7 +13,6 @@ class LiveCounter(BasePage):
 
 application = webapp.WSGIApplication(
         [('/ajax/_Device.getCount', AjaxDeviceCount),
-         ('/ajax/_DeviceAggregate.getCount', AjaxDevicesCount),
          ('/ajax/LiveCounter', LiveCounter)], debug=True)
 
 
