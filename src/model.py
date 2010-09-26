@@ -1,9 +1,7 @@
+from base import BaseCounter
 from google.appengine.ext import db
 from utils import parseModVersion, getGeoIPCode, MemcacheObject
 import logging
-
-DEVICES = ['bravo', 'dream_sapphire', 'espresso', 'hero',
-           'heroc', 'inc', 'liberty', 'passion', 'sholes', 'supersonic']
 
 class Device(db.Model):
     type = db.StringProperty()
@@ -19,28 +17,26 @@ class Device(db.Model):
         mo = MemcacheObject("Device.getCount")
         if mo.get() is None:
             devices = db.GqlQuery("SELECT * FROM Device").count()
-            return mo.set(devices, 30)
+            return mo.set(devices, 1)
         else:
             return mo.get()
 
     def updateCarrier(self, carrier):
+        if carrier == "T - Mobile":
+            carrier = "T-Mobile"
+
         # Increment the counter if the carrier was not previously defined.
         if not self.carrier and carrier:
             DeviceCarriers.increment(carrier)
             self.carrier = carrier
 
-    def updateCountry(self, country, ip):
-        # Increment the country if it was not previously defined.
-        if country is None or country is "Unknown":
-            if not self.country_code:
-                country = getGeoIPCode(ip)
-
-        if not self.country_code or self.country_code == "Unknown":
-            self.country_code = country
+    def updateCountry(self, country):
+        # Increment the counter if the country was not previously defined.
+        if not self.country_code and country != "Unknown" and country:
             DeviceCountries.increment(country)
+            self.country_code = country
 
     def updateVersion(self, raw_version):
-        raw_version = "CyanogenMod-6.1.0-RC0-N1"
         clean_version = parseModVersion(raw_version)
 
         # Process for a new device.
@@ -78,134 +74,20 @@ class Device(db.Model):
             device.type = kwargs.get('type')
 
         device.updateCarrier(kwargs.get('carrier'))
-        device.updateCountry(kwargs.get('country'), kwargs.get('ip'))
+        device.updateCountry(kwargs.get('country'))
         device.updateVersion(kwargs.get('version'))
         device.put()
 
-class DeviceCarriers(db.Model):
-    carrier = db.StringProperty()
-    count = db.IntegerProperty()
+class DeviceCarriers(BaseCounter):
+    pass
 
-    @classmethod
-    def increment(cls, carrier):
-        counter = cls.get_by_key_name(carrier)
-        if counter is None:
-            counter = cls(key_name=carrier)
-            counter.carrier = carrier
-            counter.count = 0
+class DeviceVersions(BaseCounter):
+    pass
 
-        counter.count += 1
-        counter.put()
+class DeviceCountries(BaseCounter):
+    pass
 
-    @classmethod
-    def decrement(cls, carrier):
-        counter = cls.get_by_key_name(carrier)
-        if counter is None:
-            counter = cls(key_name=carrier)
-            counter.carrier = carrier
-            counter.count = 0
-
-        counter.count -= 1
-        counter.put()
-
-    @classmethod
-    def generateGraphData(cls):
-        mo = MemcacheObject("DeviceCarriers.generateGraphData")
-        if mo.get() is None:
-            counts = cls.all().fetch(100)
-            values = []
-            for carrier in counts:
-                value = (carrier.carrier, carrier.count)
-                values.append(value)
-
-            return mo.set(values)
-        else:
-            return mo.get()
-
-class DeviceVersions(db.Model):
-    version = db.StringProperty()
-    count = db.IntegerProperty()
-
-    @classmethod
-    def increment(cls, version):
-        counter = cls.get_by_key_name(version)
-        if counter is None:
-            counter = cls(key_name=version)
-            counter.version = version
-            counter.count = 0
-
-        counter.count += 1
-        counter.put()
-
-    @classmethod
-    def decrement(cls, version):
-        counter = cls.get_by_key_name(version)
-        if counter is None:
-            counter = cls(key_name=version)
-            counter.version = version
-            counter.count = 0
-
-        counter.count -= 1
-        counter.put()
-
-    @classmethod
-    def generateGraphData(cls):
-        mo = MemcacheObject("DeviceVersions.generateGraphData")
-        if mo.get() is None:
-            counts = cls.all().fetch(100)
-            values = []
-            for version in counts:
-                value = (version.version, version.count)
-                values.append(value)
-
-            return mo.set(values)
-        else:
-            return mo.get()
-
-class DeviceCountries(db.Model):
-    country_code = db.StringProperty()
-    count = db.IntegerProperty()
-
-    @classmethod
-    def increment(cls, country_code):
-        counter = cls.get_by_key_name(country_code)
-        if counter is None:
-            counter = cls(key_name=country_code)
-            counter.country_code = country_code
-            counter.count = 0
-
-        counter.count += 1
-        counter.put()
-
-    @classmethod
-    def generateGraphData(cls):
-        mo = MemcacheObject("DeviceCountries.generateGraphData")
-        if mo.get() is None:
-            counts = cls.all().fetch(1000)
-            values = []
-            for device in counts:
-                value = (device.country_code, device.count)
-                values.append(value)
-
-            return mo.set(values)
-        else:
-            return mo.get()
-
-class DeviceAggregate(db.Model):
-    type = db.StringProperty()
-    count = db.IntegerProperty()
-
-    @classmethod
-    def increment(cls, device):
-        counter = cls.get_by_key_name(device)
-        if counter is None:
-            counter = cls(key_name=device)
-            counter.type = device
-            counter.count = 0
-
-        counter.count += 1
-        counter.put()
-
+class DeviceAggregate(BaseCounter):
     @classmethod
     def getCount(cls):
         mo = MemcacheObject("DeviceAggregate.getCount")
@@ -215,56 +97,5 @@ class DeviceAggregate(db.Model):
         else:
             return mo.get()
 
-    @classmethod
-    def generateGraphData(cls):
-        mo = MemcacheObject("DeviceAggregate.generateGraphData")
-        if mo.get() is None:
-            counts = cls.all().fetch(100)
-            values = []
-            for device in counts:
-                value = (device.type, device.count)
-                values.append(value)
-
-            return mo.set(values)
-        else:
-            return mo.get()
-
-class UnknownVersions(db.Model):
-    version = db.StringProperty()
-    count = db.IntegerProperty()
-
-    @classmethod
-    def increment(cls, key):
-        counter = cls.get_by_key_name(key)
-        if counter is None:
-            counter = cls(key_name=key)
-            counter.version = key
-            counter.count = 0
-
-        counter.count += 1
-        counter.put()
-
-    @classmethod
-    def decrement(cls, key):
-        counter = cls.get_by_key_name(key)
-        if counter is None:
-            counter = cls(key_name=key)
-            counter.version = key
-            counter.count = 0
-
-        counter.count -= 1
-        counter.put()
-
-    @classmethod
-    def generateGraphData(cls):
-        mo = MemcacheObject("UnknownVersions.generateGraphData")
-        if mo.get() is None:
-            counts = cls.all().fetch(100)
-            values = []
-            for version in counts:
-                value = (version.version, version.count)
-                values.append(value)
-
-            return mo.set(values)
-        else:
-            return mo.get()
+class UnknownVersions(BaseCounter):
+    pass

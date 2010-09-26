@@ -29,10 +29,12 @@ def getGeoIPCode(ipaddr):
 
 class MemcacheObject(object):
     def __init__(self, key):
+        key = "0_%s" % key
         self.key = key
         self.value = memcache.get(key)
 
-    def set(self, value, expiration=60):
+    def set(self, value, expiration=1):
+        logging.debug("MemcacheObject(%s) e:%s v:%s" % (self.key, expiration, value))
         memcache.add(self.key, value, expiration)
         self.value = value
         return self.get()
