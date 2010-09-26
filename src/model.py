@@ -16,7 +16,7 @@ class Device(db.Model):
         mo = MemcacheObject("Device.getCount")
         if mo.get() is None:
             devices = db.GqlQuery("SELECT * FROM Device").count()
-            return mo.set(devices, 1)
+            return mo.set(devices, 5)
         else:
             return mo.get()
 
