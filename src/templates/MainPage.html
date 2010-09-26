@@ -14,7 +14,6 @@
         // Set a callback to run when the Google Visualization API is loaded.
         google.setOnLoadCallback(function(){
             drawCharts();
-            refreshCounts();
         });
         
         // Callbacks
@@ -95,28 +94,6 @@
             
             var chart = new google.visualization.GeoMap(document.getElementById('country_chart'));
             chart.draw(data, {width: 600, height: 440});
-        }
-        
-        function refreshCounts() {
-            var device_count = $('#device_count').html();
-            $.get('/ajax/_Device.getCount', function(data){
-                if (device_count != data) {
-                    $('#device_count').html(data);
-                    $('#device_count').animate({color: '#00A1A6'}, 1000);
-                    $('#device_count').animate({color: '#000000'}, 500);
-                }
-            });
-            
-            var devices_count = $('#devices_count').html();
-            $.get('/ajax/_DeviceAggregate.getCount', function(data){
-                if (devices_count != data) {
-                    $('#devices_count').html(data);
-                    $('#devices_count').animate({color: '#00A1A6'}, 1000);
-                    $('#devices_count').animate({color: '#000000'}, 500);
-                }
-            });
-            
-            setTimeout("refreshCounts();", 15000);
         }
     </script>
     
