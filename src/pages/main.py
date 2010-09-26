@@ -8,7 +8,7 @@ class MainPage(BasePage):
     def get(self):
         tpl_values = {
             'device_count': Device.getCount(),
-            'devices_count': DeviceAggregate.getCount(),
+            'devices_count': 0,
             'graph_by_device': DeviceAggregate.generateGraphData(),
             'graph_by_version': DeviceVersions.generateGraphData(),
             'graph_by_country': DeviceCountries.generateGraphData(),

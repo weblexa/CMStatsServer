@@ -1,6 +1,6 @@
-from base import BaseCounter
+from base import BaseShardedCounter
 from google.appengine.ext import db
-from utils import parseModVersion, getGeoIPCode, MemcacheObject
+from utils import parseModVersion, MemcacheObject
 import logging
 
 class Device(db.Model):
@@ -25,42 +25,16 @@ class Device(db.Model):
         if carrier == "T - Mobile":
             carrier = "T-Mobile"
 
-        # Increment the counter if the carrier was not previously defined.
         if not self.carrier and carrier:
-            DeviceCarriers.increment(carrier)
             self.carrier = carrier
 
     def updateCountry(self, country):
-        # Increment the counter if the country was not previously defined.
         if not self.country_code and country != "Unknown" and country:
-            DeviceCountries.increment(country)
             self.country_code = country
 
     def updateVersion(self, raw_version):
         clean_version = parseModVersion(raw_version)
-
-        # Process for a new device.
-        if not self.version:
-            DeviceVersions.increment(clean_version)
-            self.version = clean_version
-            self.version_raw = raw_version
-
-            if clean_version == "Unknown":
-                UnknownVersions.increment(raw_version)
-
-            return
-
-        # Process for an existing device.
-        if self.version and self.version != clean_version:
-            DeviceVersions.decrement(self.version)
-            DeviceVersions.increment(clean_version)
-            self.version = clean_version
-
-        if raw_version == "Unknown":
-            if self.version_raw != raw_version:
-                UnknownVersions.decrement(self.version_raw)
-                UnknownVersions.increment(raw_version)
-
+        self.version = clean_version
         self.version_raw = raw_version
 
     @classmethod
@@ -70,7 +44,6 @@ class Device(db.Model):
         # Create new record if one does not exist.
         if device is None:
             device = cls(key_name=kwargs.get('key_name'))
-            DeviceAggregate.increment(kwargs.get('type'))
             device.type = kwargs.get('type')
 
         device.updateCarrier(kwargs.get('carrier'))
@@ -78,24 +51,17 @@ class Device(db.Model):
         device.updateVersion(kwargs.get('version'))
         device.put()
 
-class DeviceCarriers(BaseCounter):
+class DeviceCarriers(BaseShardedCounter):
     pass
 
-class DeviceVersions(BaseCounter):
+class DeviceVersions(BaseShardedCounter):
     pass
 
-class DeviceCountries(BaseCounter):
+class DeviceCountries(BaseShardedCounter):
     pass
 
-class DeviceAggregate(BaseCounter):
-    @classmethod
-    def getCount(cls):
-        mo = MemcacheObject("DeviceAggregate.getCount")
-        if mo.get() is None:
-            devices = db.GqlQuery("SELECT * FROM DeviceAggregate").count()
-            return mo.set(devices)
-        else:
-            return mo.get()
+class DeviceAggregate(BaseShardedCounter):
+    pass
 
-class UnknownVersions(BaseCounter):
+class UnknownVersions(BaseShardedCounter):
     pass
