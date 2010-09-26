@@ -31,7 +31,7 @@
             data.addColumn('number', 'Installations');
             data.addRows([
                 {% for value in graph_by_device %}
-                ['{{ value.0 }}', {{ value.1 }}],
+                ['{{ value.0 | escape }}', {{ value.1 }}],
                 {% endfor %}
             ]);
             
@@ -46,7 +46,7 @@
             data.addColumn('number', 'Installations');
             data.addRows([
                 {% for value in graph_by_version %}
-                ['{{ value.0 }}', {{ value.1 }}],
+                ['{{ value.0 | escape }}', {{ value.1 }}],
                 {% endfor %}
             ]);
             
@@ -60,7 +60,7 @@
             data.addColumn('number', 'Installations');
             data.addRows([
                 {% for value in graph_unknown_versions %}
-                ['{{ value.0 }}', {{ value.1 }}],
+                ['{{ value.0 | escape }}', {{ value.1 }}],
                 {% endfor %}
             ]);
             
@@ -74,7 +74,7 @@
             data.addColumn('number', 'Installations');
             data.addRows([
                 {% for value in graph_carriers %}
-                ['{{ value.0 }}', {{ value.1 }}],
+                ['{{ value.0 | escape }}', {{ value.1 }}],
                 {% endfor %}
             ]);
             
@@ -88,7 +88,7 @@
             data.addColumn('number', 'Installations');
             data.addRows([
                 {% for value in graph_by_country %}
-                ['{{ value.0 }}', {{ value.1 }}],
+                ['{{ value.0 | escape }}', {{ value.1 }}],
                 {% endfor %}
             ]);
             

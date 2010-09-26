@@ -28,7 +28,7 @@
             data.addColumn('number', 'Count');
             data.addRows([
                 {% for value in carrier_data %}
-                ['{{ value.0 }}', {{ value.1 }}],
+                ['{{ value.0 | escape }}', {{ value.1 }}],
                 {% endfor %}
             ]);
             
@@ -42,7 +42,7 @@
             data.addColumn('number', 'Installations');
             data.addRows([
                 {% for value in carrier_data %}
-                ['{{ value.0 }}', {{ value.1 }}],
+                ['{{ value.0 | escape }}', {{ value.1 }}],
                 {% endfor %}
             ]);
             
