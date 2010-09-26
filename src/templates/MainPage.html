@@ -8,9 +8,14 @@
     <script type="text/javascript">
         // Load the Visualization API and the piechart package.
         google.load('visualization', '1', {'packages':['corechart', 'geomap']});
+        google.load("jquery", "1.4.2");
+        google.load("jqueryui", "1.8.5");
         
         // Set a callback to run when the Google Visualization API is loaded.
-        google.setOnLoadCallback(drawCharts);
+        google.setOnLoadCallback(function(){
+            drawCharts();
+            refreshCounts();
+        });
         
         // Callbacks
         function drawCharts() {
@@ -76,6 +81,28 @@
             var chart = new google.visualization.GeoMap(document.getElementById('country_chart'));
             chart.draw(data, {width: 600, height: 440});
         }
+        
+        function refreshCounts() {
+            var device_count = $('#device_count').html();
+            $.get('/ajax/_Device.getCount', function(data){
+                if (device_count != data) {
+                    $('#device_count').html(data);
+                    $('#device_count').animate({color: '#00A1A6'}, 1000);
+                    $('#device_count').animate({color: '#000000'}, 500);
+                }
+            });
+            
+            var devices_count = $('#devices_count').html();
+            $.get('/ajax/_DeviceAggregate.getCount', function(data){
+                if (devices_count != data) {
+                    $('#devices_count').html(data);
+                    $('#devices_count').animate({color: '#00A1A6'}, 1000);
+                    $('#devices_count').animate({color: '#000000'}, 500);
+                }
+            });
+            
+            setTimeout("refreshCounts();", 15000);
+        }
     </script>
     
     <link rel="stylesheet" href="/static/blueprint/screen.css" type="text/css" media="screen, projection"> 
@@ -88,8 +115,8 @@
     <div class="container">
         <h3>CyanogenMod Statistics</h3>
         <div class="summary">
-            <b>Unique Installs: </b> {{ device_count }}<br/>
-            <b>Total Devices: </b> {{ devices_count }}<br/>
+            <b>Unique Installs: </b> <span id="device_count">{{ device_count }}</span><br/>
+            <b>Total Devices: </b> <span id="devices_count">{{ devices_count }}</span><br/>
         </div>
         <div id="device_chart" class="chart"></div>
         <div id="version_chart" class="chart"></div>
