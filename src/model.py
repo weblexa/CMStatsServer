@@ -1,6 +1,7 @@
 from base import BaseShardedCounter
 from google.appengine.ext import db
 from utils import parseModVersion, MemcacheObject
+import logging
 
 class Device(db.Model):
     type = db.StringProperty()
@@ -21,39 +22,64 @@ class Device(db.Model):
             return mo.get()
 
     def updateCarrier(self, carrier):
+        rollback = False
         if carrier == "T - Mobile":
             carrier = "T-Mobile"
 
         if not self.carrier and carrier:
-            DeviceCarriers.increment(carrier)
+            s = DeviceCarriers.increment(carrier)
+            if s is None:
+                rollback = True
             self.carrier = carrier
 
+        return rollback
+
     def updateCountry(self, country):
+        rollback = False
         if not self.country_code and country != "Unknown" and country:
-            DeviceCountries.increment(country)
+            s = DeviceCountries.increment(country)
+            if s is None:
+                rollback = True
             self.country_code = country
 
+        return rollback
+
     def updateVersion(self, version_raw):
+        rollback = False
         version_clean = parseModVersion(version_raw)
 
         if not self.version:
-            DeviceVersions.increment(version_clean)
+            s = DeviceVersions.increment(version_clean)
+            if s is None:
+                rollback = True
 
         if not self.version_raw and version_clean == "Unknown":
-            UnknownVersions.increment(version_raw)
+            s = UnknownVersions.increment(version_raw)
+            if s is None:
+                rollback = True
 
         # This looks like an upgrade, decrement the previous version.
         if self.version and self.version != version_clean:
-            DeviceVersions.decrement(self.version)
-            DeviceVersions.increment(version_clean)
+            s = DeviceVersions.decrement(self.version)
+            if s is None:
+                rollback = True
+            s = DeviceVersions.increment(version_clean)
+            if s is None:
+                rollback = True
 
         if self.version == "Unknown" and self.version_raw and self.version_raw != version_raw:
-            UnknownVersions.decrement(self.version_raw)
-            UnknownVersions.increment(version_raw)
+            s = UnknownVersions.decrement(self.version_raw)
+            if s is None:
+                rollback = True
+            s = UnknownVersions.increment(version_raw)
+            if s is None:
+                rollback = True
 
         # Finally, update the versions.
         self.version = version_clean
         self.version_raw = version_raw
+
+        return rollback
 
     @classmethod
     def add(cls, **kwargs):
@@ -64,6 +90,7 @@ class Device(db.Model):
         if kwargs.get('key_name') is None:
             return
         if kwargs.get('device') is None:
+            logging.debug("Device is none, returning.")
             return
         if kwargs.get('version') is None:
             return
@@ -76,16 +103,24 @@ class Device(db.Model):
         if device is None:
             device = cls(key_name=kwargs.get('key_name'))
             device.type = kwargs.get('device')
+            s = DeviceAggregate.increment(device.type)
+            if s is None:
+                rollback = True
 
-        if not device.updateCarrier(kwargs.get('carrier')):
+        if device.updateCarrier(kwargs.get('carrier')) is True:
+            logging.debug("updateCarrier is rolling back.")
             rollback = True
-        if not device.updateCountry(kwargs.get('country')):
+        if device.updateCountry(kwargs.get('country')) is True:
+            logging.debug("updateCountry is rolling back.")
             rollback = True
-        if not device.updateVersion(kwargs.get('version')):
+        if device.updateVersion(kwargs.get('version')) is True:
+            logging.debug("updateVersion is rolling back.")
             rollback = True
 
         if not rollback:
             device.put()
+        else:
+            logging.debug("Rolling back.")
 
 class DeviceCarriers(BaseShardedCounter):
     pass

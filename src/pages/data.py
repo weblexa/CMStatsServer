@@ -1,7 +1,7 @@
 from base import BasePage
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
-from model import DeviceCarriers
+from model import DeviceCountries, DeviceCarriers
 import re
 from django.utils import simplejson
 
@@ -26,8 +26,29 @@ class CarrierPage(BasePage):
         else:
             self.html()
 
+class CountryPage(BasePage):
+    def json(self):
+        json = simplejson.dumps(DeviceCountries.generateGraphData())
+        self.response.out.write(json)
+
+    def html(self):
+        self.render({
+            'country_data': DeviceCountries.generateGraphData()
+        })
+
+    def get(self):
+        match = re.match(r"^/data/countries\.(json|html)$", self.request.path)
+        if match:
+            if match.groups()[0] == 'json':
+                self.json()
+            elif match.groups()[0] == 'html':
+                self.html()
+        else:
+            self.html()
+
 application = webapp.WSGIApplication(
-        [('/data/carriers.*', CarrierPage)], debug=True)
+        [('/data/carriers.*', CarrierPage),
+         ('/data/countries.*', CountryPage)], debug=True)
 
 
 def main():

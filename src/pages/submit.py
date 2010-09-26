@@ -5,6 +5,9 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from model import Device
 
 class SubmitPage(BasePage):
+    def get(self):
+        self.post()
+
     def post(self):
         kwargs = {
             'key_name': self.request.get('id'),

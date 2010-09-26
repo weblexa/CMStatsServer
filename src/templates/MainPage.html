@@ -107,9 +107,7 @@
     <div class="container">
         <h3>CyanogenMod Statistics</h3>
         
-        <div id="navigation">
-            <a href="/">Dashboard</a> <a href="/data/carriers.html">Carriers</a>
-        </div>
+        {% include "_navigation.html" %}
         
         <div class="summary">
             <b>Unique Installs: </b> <span id="device_count">{{ device_count }}</span><br/>
