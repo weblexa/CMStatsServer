@@ -112,6 +112,7 @@ class Device(db.Model):
         if device is None:
             device = cls(key_name=kwargs.get('key_name'))
             device.type = kwargs.get('device')
+            logging.debug("device.type = %s" % kwargs.get('device'))
             s = DeviceAggregate.increment(device.type)
             if s is None:
                 rollback = True

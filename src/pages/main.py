@@ -9,11 +9,9 @@ class MainPage(BasePage):
         tpl_values = {
             'device_count': Device.getCount(),
             'devices_count': DeviceAggregate.getKeyCount(),
-            'graph_by_device': DeviceAggregate.generateGraphData(),
-            'graph_by_version': DeviceVersions.generateGraphData(),
-            'graph_by_country': DeviceCountries.generateGraphData(),
-            'graph_unknown_versions': UnknownVersions.generateGraphData(),
-            'graph_carriers': DeviceCarriers.generateGraphData(),
+            'device_data': DeviceAggregate.generateGraphData(),
+            'carrier_count': DeviceCarriers.getKeyCount(),
+            'country_count': DeviceCountries.getKeyCount(),
         }
 
         self.render(tpl_values)

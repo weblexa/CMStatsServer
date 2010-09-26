@@ -6,23 +6,16 @@
     
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
-        // Load the Visualization API and the piechart package.
-        google.load('visualization', '1', {'packages':['corechart', 'geomap']});
+        google.load('visualization', '1', {'packages':['corechart']});
         google.load("jquery", "1.4.2");
         google.load("jqueryui", "1.8.5");
         
-        // Set a callback to run when the Google Visualization API is loaded.
         google.setOnLoadCallback(function(){
             drawCharts();
         });
         
-        // Callbacks
         function drawCharts() {
             drawDeviceChart();
-            drawVersionChart();
-            drawUnknownVersionChart();
-            drawCarrierChart();
-            drawCountryChart();
         }
         
         function drawDeviceChart() {
@@ -30,70 +23,13 @@
             data.addColumn('string', 'Device');
             data.addColumn('number', 'Installations');
             data.addRows([
-                {% for value in graph_by_device %}
+                {% for value in device_data %}
                 ['{{ value.0|escape }}', {{ value.1 }}],
                 {% endfor %}
             ]);
             
-            // Instantiate and draw our chart, passing in some options.
             var chart = new google.visualization.PieChart(document.getElementById('device_chart'));
-            chart.draw(data, {width: 600, height: 440, title: 'Installations by Device'});
-        }
-        
-        function drawVersionChart() {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Versions');
-            data.addColumn('number', 'Installations');
-            data.addRows([
-                {% for value in graph_by_version %}
-                ['{{ value.0|escape }}', {{ value.1 }}],
-                {% endfor %}
-            ]);
-            
-            var chart = new google.visualization.PieChart(document.getElementById('version_chart'));
-            chart.draw(data, {width: 600, height: 440, title: 'Installations by Version'});
-        }
-        
-        function drawUnknownVersionChart() {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Unknown Versions');
-            data.addColumn('number', 'Installations');
-            data.addRows([
-                {% for value in graph_unknown_versions %}
-                ['{{ value.0|escape }}', {{ value.1 }}],
-                {% endfor %}
-            ]);
-            
-            var chart = new google.visualization.PieChart(document.getElementById('unknown_version_chart'));
-            chart.draw(data, {width: 600, height: 440, title: 'Unknown Version (kangers)'});
-        }
-        
-        function drawCarrierChart() {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Carrier');
-            data.addColumn('number', 'Installations');
-            data.addRows([
-                {% for value in graph_carriers %}
-                ['{{ value.0|escape  }}', {{ value.1 }}],
-                {% endfor %}
-            ]);
-            
-            var chart = new google.visualization.PieChart(document.getElementById('carrier_chart'));
-            chart.draw(data, {width: 600, height: 440, title: 'Carriers'});
-        }
-        
-        function drawCountryChart() {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Country');
-            data.addColumn('number', 'Installations');
-            data.addRows([
-                {% for value in graph_by_country %}
-                ['{{ value.0|escape }}', {{ value.1 }}],
-                {% endfor %}
-            ]);
-            
-            var chart = new google.visualization.GeoMap(document.getElementById('country_chart'));
-            chart.draw(data, {width: 600, height: 440});
+            chart.draw(data, {width: 468, height: 300, title: 'Installations by Device'});
         }
     </script>
     
@@ -109,15 +45,21 @@
         
         {% include "_navigation.html" %}
         
-        <div class="summary">
-            <b>Unique Installs: </b> <span id="device_count">{{ device_count }}</span><br/>
-            <b>Total Devices: </b> <span id="devices_count">{{ devices_count }}</span><br/>
+        <div class="span-12 last">
+            <div id="device_chart" class="chart"></div>
         </div>
-        <div id="device_chart" class="chart"></div>
-        <div id="version_chart" class="chart"></div>
-        <div id="unknown_version_chart" class="chart"></div>
-        <div id="carrier_chart" class="chart"></div>
-        <div id="country_chart" class="chart"></div>
+        
+        <div class="span-12">
+            <div style="padding: 10px;">
+                <ul>
+                <li><b>Total Installs: </b> <span id="device_count">{{ device_count }}</span></li>
+                <li><b>Total Devices: </b> <span id="devices_count">{{ devices_count }}</span></li>
+                <li><b>Total Carriers: </b> <span id="carriers_count"> {{ carrier_count }}</span></li>
+                <li><b>Total Countries: </b> <span id="country_count"> {{ country_count }}</span></li>
+                </ul>
+            </div>
+        </div>
+        
     </div>
 </body>
 </html>

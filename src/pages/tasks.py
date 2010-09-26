@@ -41,7 +41,6 @@ class FlushCounterWorkerPage(BasePage):
 
 class AggregateDevicesPage(BasePage):
     def get(self):
-        #taskqueue.add(url='/tasks/FlushQueue', params={'cls': 'DeviceAggregate'})
         db.delete(DeviceAggregate.all().fetch(400))
 
         total = (Device.all().count() / 10) + 1
@@ -61,7 +60,7 @@ class AggregateDevicesWorkerPage(BasePage):
 
 class AggregateCarriersPage(BasePage):
     def get(self):
-        db.delete(DeviceAggregate.all().fetch(1000))
+        db.delete(DeviceCarriers.all().fetch(1000))
 
         total = (Device.all().count() / 10) + 1
         for x in xrange(total):
@@ -81,7 +80,7 @@ class AggregateCarriersWorkerPage(BasePage):
 
 class AggregateVersionsPage(BasePage):
     def get(self):
-        db.delete(DeviceAggregate.all().fetch(400))
+        db.delete(DeviceVersions.all().fetch(400))
 
         total = (Device.all().count() / 10) + 1
         for x in xrange(total):
@@ -100,7 +99,7 @@ class AggregateVersionsWorkerPage(BasePage):
 
 class AggregateCountriesPage(BasePage):
     def get(self):
-        db.delete(DeviceAggregate.all().fetch(1000))
+        db.delete(DeviceCountries.all().fetch(1000))
 
         total = (Device.all().count() / 10) + 1
         for x in xrange(total):
@@ -119,7 +118,7 @@ class AggregateCountriesWorkerPage(BasePage):
 
 class AggregateUnknownVersionsPage(BasePage):
     def get(self):
-        db.delete(DeviceAggregate.all().fetch(400))
+        db.delete(UnknownVersions.all().fetch(400))
 
         total = (Device.all().filter('version =', 'Unknown').count() / 10) + 1
         for x in xrange(total):

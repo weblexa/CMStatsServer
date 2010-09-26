@@ -2,10 +2,6 @@ body {
     padding: 10px;
 }
 
-div.summary {
-    padding: 10px;
-}
-
 div.chart {
     text-align: center;
     border: 1px solid #CCCCCC;
@@ -24,6 +20,7 @@ div#navigation {
     font-weight: bold;
     background: #F2F2F2;
     padding: 5px;
+    margin-bottom: 10px;
 }
 
 div#navigation a {

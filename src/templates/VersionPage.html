@@ -7,7 +7,7 @@
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
         // Load the Visualization API and the piechart package.
-        google.load('visualization', '1', {'packages':['geomap', 'table']});
+        google.load('visualization', '1', {'packages':['corechart', 'table']});
         google.load("jquery", "1.4.2");
         google.load("jqueryui", "1.8.5");
         
@@ -18,36 +18,51 @@
         
         // Callbacks
         function drawCharts() {
-            drawCountryTable();
-            drawCountryChart();
+            drawVersionChart();
+            drawUnknownVersionChart();
+            drawVersionTable();
         }
         
-        function drawCountryTable() {
+        function drawVersionTable() {
             var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Country');
+            data.addColumn('string', 'Version');
             data.addColumn('number', 'Count');
             data.addRows([
-                {% for value in country_data %}
+                {% for value in version_table_data %}
                 ['{{ value.0|escape }}', {{ value.1 }}],
                 {% endfor %}
             ]);
             
-            var chart = new google.visualization.Table(document.getElementById('country_table'));
+            var chart = new google.visualization.Table(document.getElementById('version_table'));
             chart.draw(data, {showRowNumber: false});
         }
         
-        function drawCountryChart() {
+        function drawVersionChart() {
             var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Country');
+            data.addColumn('string', 'Version');
             data.addColumn('number', 'Installations');
             data.addRows([
-                {% for value in country_data %}
+                {% for value in version_data %}
                 ['{{ value.0|escape }}', {{ value.1 }}],
                 {% endfor %}
             ]);
             
-            var chart = new google.visualization.GeoMap(document.getElementById('country_chart'));
-            chart.draw(data, {width: 948, height: 440});
+            var chart = new google.visualization.PieChart(document.getElementById('version_chart'));
+            chart.draw(data, {width: 468, height: 300, title: 'Versions'});
+        }
+        
+        function drawUnknownVersionChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Version');
+            data.addColumn('number', 'Installations');
+            data.addRows([
+                {% for value in unknown_version_data %}
+                ['{{ value.0|escape }}', {{ value.1 }}],
+                {% endfor %}
+            ]);
+            
+            var chart = new google.visualization.PieChart(document.getElementById('unknown_version_chart'));
+            chart.draw(data, {width: 468, height: 300, title: 'Unknown Versions'});
         }
     </script>
     
@@ -59,13 +74,14 @@
 </head>
 <body>
     <div class="container">
-        <h3>CyanogenMod Statistics - Countries</h3>
-
+        <h3>CyanogenMod Statistics - Versions</h3>
+        
         {% include "_navigation.html" %}
         
         <br/>
-        <div class="span-24 last"><div class="chart" id="country_chart"></div><br/></div>
-        <div class="span-24 last`"><div class="chart" id="country_table"></div></div>
+        <div class="span-12"><div class="chart" id="version_chart"></div><br/></div>
+        <div class="span-12 last"><div class="chart" id="unknown_version_chart"></div><br/></div>
+        <div class="span-24 last`"><div class="chart" id="version_table"></div></div>
     </div>
 </body>
 </html>
