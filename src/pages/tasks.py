@@ -23,7 +23,8 @@ class AggregateDevicesWorkerPage(BasePage):
         devices = Device.all().fetch(10, offset)
         for device in devices:
             logging.debug("Device: %s" % device.key().name())
-            DeviceAggregate.increment(device.type)
+            if device.type:
+                DeviceAggregate.increment(device.type)
 
 class AggregateCarriersPage(BasePage):
     def get(self):
@@ -63,7 +64,8 @@ class AggregateVersionsWorkerPage(BasePage):
         devices = Device.all().fetch(10, offset)
         for device in devices:
             logging.debug("Device: %s" % device.key().name())
-            DeviceVersions.increment(device.version)
+            if device.version:
+                DeviceVersions.increment(device.version)
 
 class AggregateCountriesPage(BasePage):
     def get(self):
