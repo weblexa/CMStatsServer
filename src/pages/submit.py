@@ -9,9 +9,11 @@ class SubmitPage(BasePage):
             'key_name': self.request.get('id'),
             'type': self.request.get('type'),
             'version': self.request.get('version'),
+            'country': self.request.get('country'),
+            'carrier': self.request.get('carrier'),
             'ip': self.request.remote_addr,
         }
-        Device.update(**kwargs)
+        Device.add(**kwargs)
 
 application = webapp.WSGIApplication(
         [('/submit', SubmitPage)], debug=True)

@@ -22,6 +22,7 @@
             drawDeviceChart();
             drawVersionChart();
             drawUnknownVersionChart();
+            drawCarrierChart();
             drawCountryChart();
         }
         
@@ -66,6 +67,20 @@
             
             var chart = new google.visualization.PieChart(document.getElementById('unknown_version_chart'));
             chart.draw(data, {width: 600, height: 440, title: 'Unknown Version (kangers)'});
+        }
+        
+        function drawCarrierChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Carrier');
+            data.addColumn('number', 'Installations');
+            data.addRows([
+                {% for value in graph_carriers %}
+                ['{{ value.0 }}', {{ value.1 }}],
+                {% endfor %}
+            ]);
+            
+            var chart = new google.visualization.PieChart(document.getElementById('carrier_chart'));
+            chart.draw(data, {width: 600, height: 440, title: 'Carriers'});
         }
         
         function drawCountryChart() {
@@ -121,6 +136,7 @@
         <div id="device_chart" class="chart"></div>
         <div id="version_chart" class="chart"></div>
         <div id="unknown_version_chart" class="chart"></div>
+        <div id="carrier_chart" class="chart"></div>
         <div id="country_chart" class="chart"></div>
     </div>
 </body>

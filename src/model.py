@@ -10,6 +10,7 @@ class Device(db.Model):
     version = db.StringProperty()
     version_raw = db.StringProperty()
     country_code = db.StringProperty()
+    carrier = db.StringProperty()
     first_seen = db.DateTimeProperty(auto_now_add=True)
     last_seen = db.DateTimeProperty(auto_now=True)
 
@@ -22,45 +23,104 @@ class Device(db.Model):
         else:
             return mo.get()
 
-    @classmethod
-    def update(cls, **kwargs):
-        key_name = kwargs.get('key_name')
-        device_type = kwargs.get('type')
-        device_version = parseModVersion(kwargs.get('version'))
-        device_version_raw = kwargs.get('version')
+    def updateCarrier(self, carrier):
+        # Increment the counter if the carrier was not previously defined.
+        if not self.carrier and carrier:
+            DeviceCarriers.increment(carrier)
+            self.carrier = carrier
 
-        device = cls.get_by_key_name(key_name)
-        logging.debug("/submit device = %s" % device)
+    def updateCountry(self, country, ip):
+        # Increment the country if it was not previously defined.
+        if country is None or country is "Unknown":
+            if not self.country_code:
+                country = getGeoIPCode(ip)
+
+        if not self.country_code or self.country_code == "Unknown":
+            self.country_code = country
+            DeviceCountries.increment(country)
+
+    def updateVersion(self, raw_version):
+        raw_version = "CyanogenMod-6.1.0-RC0-N1"
+        clean_version = parseModVersion(raw_version)
+
+        # Process for a new device.
+        if not self.version:
+            DeviceVersions.increment(clean_version)
+            self.version = clean_version
+            self.version_raw = raw_version
+
+            if clean_version == "Unknown":
+                UnknownVersions.increment(raw_version)
+
+            return
+
+        # Process for an existing device.
+        if self.version and self.version != clean_version:
+            DeviceVersions.decrement(self.version)
+            DeviceVersions.increment(clean_version)
+            self.version = clean_version
+
+        if raw_version == "Unknown":
+            if self.version_raw != raw_version:
+                UnknownVersions.decrement(self.version_raw)
+                UnknownVersions.increment(raw_version)
+
+        self.version_raw = raw_version
+
+    @classmethod
+    def add(cls, **kwargs):
+        device = cls.get_by_key_name(kwargs.get('key_name'))
 
         # Create new record if one does not exist.
         if device is None:
-            device = cls(key_name=key_name)
-            DeviceAggregate.increment(device_type)
-            DeviceVersions.increment(device_version)
+            device = cls(key_name=kwargs.get('key_name'))
+            DeviceAggregate.increment(kwargs.get('type'))
+            device.type = kwargs.get('type')
 
-        if device.country_code is None:
-            country_code = getGeoIPCode(kwargs.get('ip'))
-            logging.debug("model country_code = %s" % country_code)
-            if country_code:
-                device.country_code = country_code
-                DeviceCountries.increment(country_code)
-
-        # Update UnknownVersions if necessary.
-        if device_version == "Unknown":
-            if device.version_raw != device_version_raw:
-                UnknownVersions.increment(device_version_raw)
-                if device.device_version_raw:
-                    UnknownVersions.decrement(device.device_version_raw)
-
-        # Update DeviceVersions if necessary.
-        if device.version and device.version != device_version:
-            DeviceVersions.decrement(device.version)
-            DeviceVersions.increment(device_version)
-
-        device.type = device_type
-        device.version = device_version
-        device.version_raw = device_version_raw
+        device.updateCarrier(kwargs.get('carrier'))
+        device.updateCountry(kwargs.get('country'), kwargs.get('ip'))
+        device.updateVersion(kwargs.get('version'))
         device.put()
+
+class DeviceCarriers(db.Model):
+    carrier = db.StringProperty()
+    count = db.IntegerProperty()
+
+    @classmethod
+    def increment(cls, carrier):
+        counter = cls.get_by_key_name(carrier)
+        if counter is None:
+            counter = cls(key_name=carrier)
+            counter.carrier = carrier
+            counter.count = 0
+
+        counter.count += 1
+        counter.put()
+
+    @classmethod
+    def decrement(cls, carrier):
+        counter = cls.get_by_key_name(carrier)
+        if counter is None:
+            counter = cls(key_name=carrier)
+            counter.carrier = carrier
+            counter.count = 0
+
+        counter.count -= 1
+        counter.put()
+
+    @classmethod
+    def generateGraphData(cls):
+        mo = MemcacheObject("DeviceCarriers.generateGraphData")
+        if mo.get() is None:
+            counts = cls.all().fetch(100)
+            values = []
+            for carrier in counts:
+                value = (carrier.carrier, carrier.count)
+                values.append(value)
+
+            return mo.set(values)
+        else:
+            return mo.get()
 
 class DeviceVersions(db.Model):
     version = db.StringProperty()
