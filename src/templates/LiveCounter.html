@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd"> 
+<html>
+<head>
+    <title>CyanogenMod Live Counter</title>
+    
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+        google.load("jquery", "1.4.2");
+        google.load("jqueryui", "1.8.5");
+        
+        google.setOnLoadCallback(function() {
+            refresh();
+        });
+        
+        function refresh(){
+            var oldValue = $('#counter').html();
+            
+            $.get('/ajax/_Device.getCount', function(data){
+                if (oldValue != data) {
+                    $('#counter').html(data);
+                    $('#counter').animate({color: '#00A1A6'}, 1000);
+                    $('#counter').animate({color: '#000000'}, 500);
+                }
+            });
+            
+            setTimeout("refresh();", 30000);
+        }
+    </script>
+    
+    <link rel="stylesheet" href="/static/blueprint/screen.css" type="text/css" media="screen, projection"> 
+    <link rel="stylesheet" href="/static/blueprint/print.css" type="text/css" media="print"> 
+    <!--[if lt IE 8]><link rel="stylesheet" href="/static/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+    
+    <link rel="stylesheet" href="/static/core.css">
+</head>
+<body>
+    <div class="container">
+        <div id="counter"></div>
+    </div>
+</body>
+</html>
