@@ -46,6 +46,13 @@ class BaseShardedCounter(db.Model):
         db.run_in_transaction(txn)
 
     @classmethod
+    def getKeyCount(cls):
+        relations = ShardedCounterRelations.all() \
+                        .filter('cls_ =', cls.__name__) \
+                        .count()
+        return relations
+
+    @classmethod
     def getCount(cls, key_=None):
         total = 0
         if key_:
