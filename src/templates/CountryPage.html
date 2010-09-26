@@ -7,7 +7,7 @@
     <script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <script type="text/javascript">
         // Load the Visualization API and the piechart package.
-        google.load('visualization', '1', {'packages':['corechart', 'table']});
+        google.load('visualization', '1', {'packages':['geomap', 'table']});
         google.load("jquery", "1.4.2");
         google.load("jqueryui", "1.8.5");
         
@@ -18,36 +18,36 @@
         
         // Callbacks
         function drawCharts() {
-            drawCarrierTable();
-            drawCarrierChart();
+            drawCountryTable();
+            drawCountryChart();
         }
         
-        function drawCarrierTable() {
+        function drawCountryTable() {
             var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Carrier');
+            data.addColumn('string', 'Country');
             data.addColumn('number', 'Count');
             data.addRows([
-                {% for value in carrier_data %}
+                {% for value in country_data %}
                 ['{{ value.0 }}', {{ value.1 }}],
                 {% endfor %}
             ]);
             
-            var chart = new google.visualization.Table(document.getElementById('carrier_table'));
+            var chart = new google.visualization.Table(document.getElementById('country_table'));
             chart.draw(data, {showRowNumber: false});
         }
         
-        function drawCarrierChart() {
+        function drawCountryChart() {
             var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Carrier');
+            data.addColumn('string', 'Country');
             data.addColumn('number', 'Installations');
             data.addRows([
-                {% for value in carrier_data %}
+                {% for value in country_data %}
                 ['{{ value.0 }}', {{ value.1 }}],
                 {% endfor %}
             ]);
             
-            var chart = new google.visualization.PieChart(document.getElementById('carrier_chart'));
-            chart.draw(data, {width: 628, height: 300, title: 'Carriers'});
+            var chart = new google.visualization.GeoMap(document.getElementById('country_chart'));
+            chart.draw(data, {width: 948, height: 440});
         }
     </script>
     
@@ -64,8 +64,8 @@
         {% include "_navigation.html" %}
         
         <br/>
-        <div class="span-24 last"><div class="chart" id="carrier_chart"></div><br/></div>
-        <div class="span-24 last`"><div class="chart" id="carrier_table"></div></div>
+        <div class="span-24 last"><div class="chart" id="country_chart"></div><br/></div>
+        <div class="span-24 last`"><div class="chart" id="country_table"></div></div>
     </div>
 </body>
 </html>
