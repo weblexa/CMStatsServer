@@ -1,7 +1,8 @@
 from base import BaseShardedCounter
-from google.appengine.ext import db
 from google.appengine.api import memcache
-from utils import parseModVersion, MemcacheObject
+from google.appengine.ext import db
+from utils.memcache import MemcacheObject
+from utils.string import parseModVersion
 import logging
 
 def query_counter(q, cursor=None, limit=500):

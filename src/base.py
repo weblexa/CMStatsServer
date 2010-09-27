@@ -1,6 +1,6 @@
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp import template
-from utils import MemcacheObject
+from utils.memcache import MemcacheObject
 import hashlib
 import logging
 import os

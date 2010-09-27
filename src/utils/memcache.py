@@ -1,17 +1,5 @@
-import re
 from google.appengine.api import memcache
 import logging
-
-def parseModVersion(modver):
-    match = re.match(r"^CyanogenMod-(.*)-.*$", modver)
-    if match:
-        version = match.groups()[0]
-        if "NIGHTLY" in version:
-            version = "Nightly"
-    else:
-        version = "Unknown"
-
-    return version
 
 class MemcacheObject(object):
     def __init__(self, key):
