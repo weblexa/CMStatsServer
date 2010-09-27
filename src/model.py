@@ -1,7 +1,16 @@
 from base import BaseShardedCounter
 from google.appengine.ext import db
+from google.appengine.api import memcache
 from utils import parseModVersion, MemcacheObject
 import logging
+
+def query_counter(q, cursor=None, limit=500):
+    if cursor:
+        q.with_cursor(cursor)
+    count = q.count(limit=limit)
+    if count == limit:
+        return count + query_counter(q, q.cursor(), limit=limit)
+    return count
 
 class Device(db.Model):
     type = db.StringProperty()
@@ -13,11 +22,11 @@ class Device(db.Model):
     last_seen = db.DateTimeProperty(auto_now=True)
 
     @classmethod
-    def getCount(self):
+    def getCount(cls):
         mo = MemcacheObject("Device.getCount")
         if mo.get() is None:
-            devices = db.GqlQuery("SELECT * FROM Device").count()
-            return mo.set(devices, 5)
+            total = query_counter(cls.all())            
+            return mo.set(total, 1)
         else:
             return mo.get()
 
