@@ -33,7 +33,7 @@
             ]);
             
             var chart = new google.visualization.Table(document.getElementById('country_table'));
-            chart.draw(data, {showRowNumber: false});
+            chart.draw(data, {showRowNumber: true, sortColumn: 1, sortAscending: false});
         }
         
         function drawCountryChart() {

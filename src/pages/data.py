@@ -2,6 +2,7 @@ from base import BasePage
 from django.utils import simplejson
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
+from lib.countries import getCountryFromCode
 from model import DeviceCountries, DeviceCarriers, DeviceVersions, \
     UnknownVersions
 import re
@@ -33,8 +34,17 @@ class CountryPage(BasePage):
         self.response.out.write(json)
 
     def html(self):
+        country_data = []
+        cd = DeviceCountries.generateGraphData()
+        for c in cd:
+            country = getCountryFromCode(c[0])
+            if country is not None:
+                c[0] = "%s" % (country)
+            country_data.append(c)
+
+
         self.render({
-            'country_data': DeviceCountries.generateGraphData()
+            'country_data': country_data,
         })
 
     def get(self):

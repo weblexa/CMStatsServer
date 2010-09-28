@@ -85,7 +85,7 @@ class BaseShardedCounter(db.Model):
             keys = ShardedCounterRelations.all().filter('cls_ =', cls_)
             values = []
             for key in keys:
-                value = (key.key_, cls.getCount(key.key_))
+                value = [key.key_, cls.getCount(key.key_)]
                 values.append(value)
 
             return mo.set(values)
