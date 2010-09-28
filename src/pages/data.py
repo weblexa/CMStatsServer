@@ -37,10 +37,8 @@ class CountryPage(BasePage):
         country_data = []
         cd = DeviceCountries.generateGraphData()
         for c in cd:
-            country = getCountryFromCode(c[0])
-            if country is not None:
-                c[0] = "%s" % (country)
-            country_data.append(c)
+            country = getCountryFromCode(c[0].lower())
+            country_data.append([c[0].upper(), c[1], country])
 
 
         self.render({

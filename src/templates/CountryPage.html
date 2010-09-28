@@ -28,7 +28,7 @@
             data.addColumn('number', 'Count');
             data.addRows([
                 {% for value in country_data %}
-                ['{{ value.0|escape }}', {{ value.1 }}],
+                ['{{ value.2|escape }}', {{ value.1 }}],
                 {% endfor %}
             ]);
             
@@ -40,9 +40,10 @@
             var data = new google.visualization.DataTable();
             data.addColumn('string', 'Country');
             data.addColumn('number', 'Installations');
+            data.addColumn('string', 'hover');
             data.addRows([
                 {% for value in country_data %}
-                ['{{ value.0|escape }}', {{ value.1 }}],
+                ['{{ value.0|escape }}', {{ value.1 }}, '{{ value.2|escape }}'],
                 {% endfor %}
             ]);
             
