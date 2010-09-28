@@ -176,7 +176,7 @@ countries = {
     "qa": "Qatar",
     "re": "Reunion",
     "ro": "Romania",
-    "ru": "Russian Federation",
+    "ru": "Russia",
     "rw": "Rwanda",
     "sh": "Saint Helena",
     "kn": "Saint Kitts and Nevis",
