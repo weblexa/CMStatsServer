@@ -19,7 +19,7 @@ def submit(request):
         'carrier_id': device_carrier_id,
     }
 
-    if hash == "":
+    if device_hash == "":
         return "Incomplete Data"
 
     for v in kwargs.itervalues():
