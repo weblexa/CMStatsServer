@@ -9,9 +9,9 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 requires = ['pyramid', 'WebError', 'sqlalchemy']
 
 setup(name='CMStats',
-      version='0.1',
+      version='0.2',
       description='CMStats',
-      long_description=README + '\n\n' +  CHANGES,
+      long_description=README + '\n\n' + CHANGES,
       classifiers=[
         "Programming Language :: Python",
         "Framework :: Pylons",
@@ -28,7 +28,7 @@ setup(name='CMStats',
       install_requires=requires,
       tests_require=requires,
       test_suite="cmstats",
-      entry_points = """\
+      entry_points="""\
       [paste.app_factory]
       main = cmstats:main
       """,

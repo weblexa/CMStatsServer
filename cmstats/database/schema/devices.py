@@ -17,6 +17,14 @@ class Device(Base):
     date_added = Column('date_added', DateTime)
     date_updated = Column('date_updated', DateTime)
 
+
+    @classmethod
+    def count(cls):
+        session = DBSession()
+
+        q = session.query(cls).count()
+        return q
+
     @classmethod
     def add(cls, **kwargs):
         # Clean up the version.

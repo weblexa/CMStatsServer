@@ -7,6 +7,31 @@ from sqlalchemy.orm.session import sessionmaker
 DBSession = scoped_session(sessionmaker())
 Base = declarative_base(cls=AbstractTable)
 
+def populate_data():
+    from cmstats.database.schema import Device
+    session = DBSession()
+
+    # Create some fake testing entries.
+    obj1 = Device()
+    obj1.hash = "XYZ1"
+    obj1.country = "us"
+    obj1.carrier_id = "310260"
+    obj1.kang = 0
+    obj1.version = "Nightly"
+    obj1.name = "passion"
+
+    obj2 = Device()
+    obj2.hash = "XYZ2"
+    obj2.country = "us"
+    obj2.carrier_id = "310260"
+    obj2.kang = 0
+    obj2.version = "Nightly"
+    obj2.name = "vision"
+
+    session.add(obj1)
+    session.add(obj2)
+    session.commit()
+
 def init_database(engine):
     DBSession.configure(bind=engine)
 
@@ -18,3 +43,8 @@ def init_database(engine):
 
     # Create all tables (if necessary)
     Base.metadata.create_all(engine)
+
+    try:
+        populate_data()
+    except:
+        DBSession.rollback()
