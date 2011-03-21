@@ -19,6 +19,10 @@ def submit(request):
         'carrier_id': device_carrier_id,
     }
 
+    for v in kwargs.itervalues():
+        if v == None:
+            return "Incomplete Data"
+
     # Create device record.
     Device.add(**kwargs)
 
