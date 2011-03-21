@@ -8,11 +8,11 @@ class Device(Base):
     __tablename__ = "devices"
 
     id = Column('id', Integer, primary_key=True)
-    hash = Column('hash', String, unique=True)
-    name = Column('name', String, index=True)
-    version = Column('version', String)
-    country = Column('country', String)
-    carrier_id = Column('carrier_id', String)
+    hash = Column('hash', String(32), unique=True)
+    name = Column('name', String(50), index=True)
+    version = Column('version', String(50))
+    country = Column('country', String(50))
+    carrier_id = Column('carrier_id', String(50))
     kang = Column('kang', Integer, index=True)
     date_added = Column('date_added', DateTime)
     date_updated = Column('date_updated', DateTime)
@@ -36,6 +36,8 @@ class Device(Base):
         if version == None:
             version = kwargs['version']
             obj.kang = 1
+        else:
+            obj.kang = 0
 
         # Populate the rest of the records.
         obj.hash = kwargs['hash']
