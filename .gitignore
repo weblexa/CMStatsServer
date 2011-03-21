@@ -2,3 +2,4 @@ CMStats.egg-info/*
 *.pyc
 .project
 .pydevproject
+*.db
