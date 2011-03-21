@@ -10,7 +10,8 @@ class Device(Base):
     id = Column('id', Integer, primary_key=True)
     hash = Column('hash', String(32), unique=True)
     name = Column('name', String(50), index=True)
-    version = Column('version', String(50), index=True)
+    version = Column('version', String(255), index=True)
+    version_raw = Column('version_raw', String(255))
     country = Column('country', String(50), index=True)
     carrier_id = Column('carrier_id', String(50), index=True)
     kang = Column('kang', Integer, index=True)
@@ -62,6 +63,7 @@ class Device(Base):
         obj.hash = kwargs['hash']
         obj.name = kwargs['name']
         obj.version = version
+        obj.version_raw = kwargs['version']
         obj.country = kwargs['country']
         obj.carrier_id = kwargs['carrier_id']
         obj.date_updated = func.now()
