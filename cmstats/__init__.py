@@ -28,6 +28,7 @@ def main(global_config, **settings):
 
     # App Config
     config = Configurator(root_factory=Root, settings=settings)
+    config.add_static_view('static', 'cmstats:static')
     config.scan('cmstats.views')
 
     # Wrap the app in the SessionMiddleware

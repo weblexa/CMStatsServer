@@ -26,6 +26,17 @@ class Device(Base):
         return q
 
     @classmethod
+    def device_count(cls):
+        session = DBSession()
+
+        q = session.query(func.count(cls.name), cls.name) \
+            .group_by(cls.name).all()
+
+        q = sorted(q, key=lambda x: x[0], reverse=True)
+
+        return q
+
+    @classmethod
     def add(cls, **kwargs):
         # Clean up the version.
         version = parse_modversion(kwargs['version'])
