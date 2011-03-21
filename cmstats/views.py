@@ -1,11 +1,25 @@
+from cmstats.database.schema.devices import Device
 from cmstats.resources import Root
 from pyramid.view import view_config
 
 
 @view_config(context=Root, name="submit", renderer="string")
 def submit(request):
-    device_id = request.params.get('device_id', None)
+    device_hash = request.params.get('device_hash', None)
     device_name = request.params.get('device_name', None)
     device_version = request.params.get('device_version', None)
     device_country = request.params.get('device_country', None)
     device_carrier_id = request.params.get('device_carrier_id', None)
+
+    kwargs = {
+        'hash': device_hash,
+        'name': device_name,
+        'version': device_version,
+        'country': device_country,
+        'carrier_id': device_carrier_id,
+    }
+
+    # Create device record.
+    Device.add(**kwargs)
+
+    return "Thanks!"
