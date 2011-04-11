@@ -14,15 +14,15 @@
             </tr>
             <tr>
                 <td>Official Installs</td>
-                <td>${total_nonkang}</td>
+                <td>${total_nonkang|number}</td>
             </tr>
             <tr>
                 <td>Unofficial Installs (KANGs)</td>
-                <td>${total_kang}</td>
+                <td>${total_kang|number}</td>
             </tr>
             <tr>
                 <td><b>TOTAL</b></td>
-                <td><b>${total_kang + total_nonkang}</b></td>
+                <td><b>${(total_kang + total_nonkang)|number}</b></td>
             </tr>
         </table>
         
@@ -33,7 +33,7 @@
                 <th>Total</th>
             </tr>
             % for version in version_count:
-            <tr><td>${version[1]}</td><td>${version[0]}</td></tr>
+            <tr><td>${version[1]|h}</td><td>${version[0]|number}</td></tr>
             % endfor
         </table>
         
@@ -44,7 +44,7 @@
                 <th>Total</th>
             </tr>
             % for device in device_count:
-            <tr><td>${device[1]}</td><td>${device[0]}</td></tr>
+            <tr><td>${device[1]|h}</td><td>${device[0]|number}</td></tr>
             % endfor
         </table>
     </body>
