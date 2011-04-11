@@ -9,7 +9,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 requires = ['pyramid', 'WebError', 'sqlalchemy']
 
 setup(name='CMStats',
-      version='0.2',
+      version='0.3',
       description='CMStats',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
