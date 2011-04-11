@@ -18,12 +18,16 @@ class Device(Base):
     date_added = Column('date_added', DateTime)
     date_updated = Column('date_updated', DateTime)
 
+    @classmethod
+    def count_kang(cls):
+        session = DBSession()
+        q = session.query(cls).filter(cls.kang == 1).count()
+        return q
 
     @classmethod
-    def count(cls):
+    def count_nonkang(cls):
         session = DBSession()
-
-        q = session.query(cls).count()
+        q = session.query(cls).filter(cls.kang == 0).count()
         return q
 
     @classmethod
@@ -32,6 +36,18 @@ class Device(Base):
 
         q = session.query(func.count(cls.name), cls.name) \
             .group_by(cls.name).all()
+
+        q = sorted(q, key=lambda x: x[0], reverse=True)
+
+        return q
+
+    @classmethod
+    def version_count(cls):
+        session = DBSession()
+
+        q = session.query(func.count(cls.version), cls.version) \
+            .filter(cls.kang == 0) \
+            .group_by(cls.version).all()
 
         q = sorted(q, key=lambda x: x[0], reverse=True)
 
