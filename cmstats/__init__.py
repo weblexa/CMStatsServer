@@ -17,6 +17,7 @@ class SessionMiddleware(object):
             return self.app(*args, **kwargs)
         except:
             session.rollback()
+            raise
         finally:
             session.close()
             DBSession.remove()
