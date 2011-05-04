@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>CMStats</title>
-        <link rel="stylesheet" type="text/css" href="/static/css/core.css" />
-    </head>
-    <body>
+<%inherit file="base.mako" />
         <h3>Total Installs</h3>
         <table>
             <tr>
@@ -47,5 +40,3 @@
             <tr><td>${device[1]|h}</td><td>${device[0]|number}</td></tr>
             % endfor
         </table>
-    </body>
-</html>
