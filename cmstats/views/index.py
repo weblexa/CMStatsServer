@@ -1,5 +1,6 @@
 from cmstats.database.schema.devices import Device
 from cmstats.resources import Root
+from cmstats.utils.countries import population
 from pyramid.view import view_config
 
 
@@ -17,5 +18,16 @@ def index(request):
 
 @view_config(context=Root, name='map', renderer='map.mako')
 def map_page(request):
-    country_data = Device.country_count()
+    country_data = []
+
+    for country_code,country_installs in Device.country_count():
+        country = population.get(country_code, None)
+        if not country:
+            continue
+
+        count_norm = (float(country_installs)/float(country[1]))*100000
+        country_data.append((country[0], count_norm))
+
+    print country_data
+
     return {'country_data': country_data}

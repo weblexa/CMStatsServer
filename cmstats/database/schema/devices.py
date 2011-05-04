@@ -58,7 +58,6 @@ class Device(Base):
     def country_count(cls):
         session = DBSession()
         q = session.query(cls.country, func.count('*').label('count')).group_by(cls.country).all()
-        print q
         return q
 
     @classmethod

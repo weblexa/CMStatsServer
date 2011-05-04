@@ -20,5 +20,6 @@ function drawChart() {
 </%def>
         <div style="text-align: center">
             <h2>Installations by Country</h2>
+            <h4>Normalized by country population.</h4>
             <div id="map"></div>
         </div>
