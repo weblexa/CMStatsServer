@@ -14,6 +14,7 @@ def index(request):
 
     return kwargs
 
-@view_config(context=Root, name='test', renderer='derp.mako')
-def test(request):
-    return {}
+@view_config(context=Root, name='map', renderer='map.mako')
+def map_page(request):
+    country_data = Device.country_count()
+    return {'country_data': country_data}

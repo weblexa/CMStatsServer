@@ -54,6 +54,13 @@ class Device(Base):
         return q
 
     @classmethod
+    def country_count(cls):
+        session = DBSession()
+        q = session.query(cls.country, func.count('*').label('count')).group_by(cls.country).all()
+        print q
+        return q
+
+    @classmethod
     def add(cls, **kwargs):
         # Clean up the version.
         version = parse_modversion(kwargs['version'])

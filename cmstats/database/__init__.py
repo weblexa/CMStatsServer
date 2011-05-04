@@ -14,7 +14,7 @@ def populate_data():
     # Create some fake testing entries.
     obj1 = Device()
     obj1.hash = "XYZ1"
-    obj1.country = "us"
+    obj1.country = "ca"
     obj1.carrier_id = "310260"
     obj1.kang = 0
     obj1.version = "Nightly"
