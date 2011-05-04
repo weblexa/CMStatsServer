@@ -10,6 +10,7 @@ def index(request):
             'version_count': Device.version_count(),
             'total_nonkang': Device.count_nonkang(),
             'total_kang': Device.count_kang(),
+            'total_last_day': Device.count_last_day(),
     }
 
     return kwargs

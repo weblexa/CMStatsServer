@@ -17,6 +17,10 @@
                 <td><b>TOTAL</b></td>
                 <td><b>${(total_kang + total_nonkang)|number}</b></td>
             </tr>
+            <tr>
+                <td>Last 24 Hours</td>
+                <td>${total_last_day|number}</td>
+            </tr>
         </table>
         
         <h3>Installs by Version</h3>

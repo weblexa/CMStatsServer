@@ -2,6 +2,7 @@ from cmstats.database import Base, DBSession
 from cmstats.utils.string import parse_modversion
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.sql.expression import func
+import datetime
 
 
 class Device(Base):
@@ -58,6 +59,13 @@ class Device(Base):
         session = DBSession()
         q = session.query(cls.country, func.count('*').label('count')).group_by(cls.country).all()
         print q
+        return q
+
+    @classmethod
+    def count_last_day(cls):
+        timestamp = datetime.datetime.now() - datetime.timedelta(hours=24)
+        session = DBSession()
+        q = session.query(cls).filter(cls.date_added > timestamp).count()
         return q
 
     @classmethod
