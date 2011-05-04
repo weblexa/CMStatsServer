@@ -8,10 +8,9 @@ function drawChart() {
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Country');
     data.addColumn('number', 'Installs');
-    data.addColumn('string', 'hover');
     data.addRows([
     % for value in country_data:
-    ['${value[0]|h}', ${value[1]|h}, '${value[0]|h}'],
+    ['${value[0]|h}', ${value[1]|h}],
     % endfor
     ]);
     var chart = new google.visualization.GeoMap(document.getElementById('map'));
